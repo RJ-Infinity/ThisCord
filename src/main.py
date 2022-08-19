@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+PATH = "C:\\Users\\rjinf\\AppData\\Local\\Discord"
+WAIT = 2
+
 import os
 import sys
 import json
@@ -16,7 +19,7 @@ server.config['CORS_HEADERS'] = 'Content-Type'
 
 def launchDiscord():
 	port = 8473
-	EComunic = ElectronComunicator("Discord",None,"C:\\Users\\rjinf\\AppData\\Local\\Discord",port,True)
+	EComunic = ElectronComunicator("Discord",None,PATH,port,True)
 	EComunic.use_most_recent_version()
 	EComunic.find_first_open_process()
 	open = EComunic.is_already_open()
@@ -25,7 +28,7 @@ def launchDiscord():
 		EComunic.kill_app() #if it is open but not in debug mode close it
 	if open != ElectronComunicator.OpenStates.DebugOpen:
 		EComunic.launch() # if it isnt in debug mode it is closed as it should have been closed previously
-		sleep(2)
+		sleep(WAIT)
 	return EComunic
 
 @server.route("/bootloader.js")

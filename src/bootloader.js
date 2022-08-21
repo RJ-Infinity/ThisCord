@@ -3,25 +3,25 @@ window.RJDiscord = {
 	modules:{},
 	currentModule:"/bootloader.js",
 	using(){
-		args = arguments
+		args = Array.prototype.slice.call(arguments);
 		return {from:(filename)=>{
-			filename = window.RJDiscord.parsePath(filename)
-			if (window.RJDiscord.modules[filename] == undefined){
-				window.RJDiscord.modules[filename] = {};
-				var caller = window.RJDiscord.currentModule;
+			filename = window.RJDiscord.parsePath(filename);
+			if (window.RJDiscord.modules[filename].exports === false){
+				window.RJDiscord.modules[filename].exports = {}
+
+				caller = window.RJDiscord.currentModule;
 				window.RJDiscord.currentModule = filename;
-				fetch('http://127.0.0.1:5000/scripts/'+filename).then((response) => response.text()).then(data => {
-					console.log(data);
-					(new Function("using","exports",data))(window.RJDiscord.using,window.RJDiscord.exports);
-				});
+				
+				window.RJDiscord.modules[filename].function(this.using,this.exports);
+				
 				window.RJDiscord.currentModule = caller;
 			}
 			rv = {}
 			if (window.RJDiscord.modules[filename] == undefined){
-				args.forEach(arg=>{rv[arg] = undefined})
+				throw "Error: should not ever be called EVER";
 			}else{
 				args.forEach(arg=>{
-					rv[arg] = window.RJDiscord.modules[filename][arg]
+					rv[arg] = window.RJDiscord.modules[filename].exports[arg]
 				});
 			}
 			return rv;
@@ -29,18 +29,18 @@ window.RJDiscord = {
 	},
 	exports(obj){
 		if (window.RJDiscord.modules[window.RJDiscord.currentModule] == undefined){
-			throw "Error: should not ever be called EVER (could be caused by manual modification of the window.RJDiscord.currentModule as a module is exporting things yet that module appers to never have been loaded)";
+			throw "Error: should not ever be called EVER";
 		}
-		window.RJDiscord.modules[window.RJDiscord.currentModule] = {...window.RJDiscord.modules[window.RJDiscord.currentModule],...obj}
+		window.RJDiscord.modules[window.RJDiscord.currentModule].exports = {...window.RJDiscord.modules[window.RJDiscord.currentModule].exports, ...obj};
 	},
 	parsePath(path){
 		newPath = [];
-		path = path.replaceAll("\\","/")
+		path = path.replaceAll("\\","/");
 		if (path.substring(0,1) != "/"){
-			path = window.RJDiscord.currentModule+"/../"+path
+			path = window.RJDiscord.currentModule+"/../"+path;
 		}
 		path.split("/").forEach(el=>{
-			if (el == "." || el=="") return
+			if (el == "." || el=="") return;
 			if (el == "..") {
 				if (newPath.pop() === undefined){
 					throw "Error: attempted to navigate out of scripts folder";
@@ -50,28 +50,31 @@ window.RJDiscord = {
 			}
 		});
 		return "/"+newPath.join("/");
+	},
+	fetchThroughPortal(url){
+		return fetch("http://127.0.0.1:5000/portal", {
+			method:"post",
+			body:JSON.stringify({url}),
+			mode: "cors",
+			headers: new Headers({
+				"Content-Type": "application/json"
+			})
+		})
 	}
 }
-fetch("http://127.0.0.1:5000/filesList").then(response=>response.json()).then(files=>{
-	window.RJDiscord.mains = [];
-	files["files"].forEach(file => {
-		window.RJDiscord.mains.push(window.RJDiscord.using("main").from(file).main)
-	});
-	window.RJDiscord.mains.forEach(main=>{
-		if (typeof main === "function"){
-			main();
-		}
-	});
-})
-
-
-function fetchThroughPortal(url){
-	return fetch("http://127.0.0.1:5000/portal", {
-		method:"post",
-		body:JSON.stringify({url}),
-		mode: "cors",
-		headers: new Headers({
-			"Content-Type": "application/json"
+fetch("http://127.0.0.1:5000/filesList").then(response=>response.json()).then(
+	files=>Promise.all(files["files"].map(file=>window.RJDiscord.parsePath(file)).map(file => fetch('http://127.0.0.1:5000/scripts/'+file).then((response) => response.text()).then(data => {
+		RJDiscord.modules[file] = {};
+		RJDiscord.modules[file].exports = false;
+		RJDiscord.modules[file].function =
+			(new Function("using","exports",data+"\n//# sourceURL=http://127.0.0.1:5000/scripts/"+file));
+	}))).then(_=>
+		files["files"].map(file=>RJDiscord.using("main").from(file)).forEach(main=>{
+			if (typeof main === "function"){
+				main();
+			}
 		})
-	}).then(response=>response.body)
-}
+	)
+);
+
+//# sourceURL=http://127.0.0.1:5000/bootloader.js

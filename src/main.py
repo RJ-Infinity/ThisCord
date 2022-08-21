@@ -39,7 +39,11 @@ def code():
 @server.route("/filesList")
 @cross_origin()
 def files():
-	return json.dumps({"files":[f for f in os.listdir(os.path.join(os.path.dirname(sys.argv[0]),"..","scripts")) if os.path.join(os.path.dirname(sys.argv[0]),"..","scripts",f)]})
+	files_list = []
+	for path, _, files in os.walk(os.path.join("..","scripts")):
+		for file in files:
+			files_list.append(os.path.join(path, file)[len(os.path.join("..","scripts","")):].replace("\\","/"))
+	return json.dumps({"files":files_list})
 
 
 @server.route("/scripts/<path:filename>")
@@ -74,12 +78,13 @@ def catch_all():
 
 
 if __name__ == "__main__":
-	discordDebugger = launchDiscord()
-	try:
-		for w in discordDebugger.get_windows():
-			print(w)
-			discordDebugger.run_code(w, """fetch('http://127.0.0.1:5000/bootloader.js').then((response) => response.text()).then(data => eval(data));""")
-	except requests.exceptions.ConnectionError:
-		print("Error: The electron app failed the debug connection (posibly not in debug mode)",file=sys.stderr)
-		sys.exit(1)
+	if "--no-inject" not in sys.argv:
+		discordDebugger = launchDiscord()
+		try:
+			for w in discordDebugger.get_windows():
+				print(w)
+				discordDebugger.run_code(w, """fetch('http://127.0.0.1:5000/bootloader.js').then((response) => response.text()).then(data => eval(data));""")
+		except requests.exceptions.ConnectionError:
+			print("Error: The electron app failed the debug connection (posibly not in debug mode)",file=sys.stderr)
+			sys.exit(1)
 	server.run(debug=False)

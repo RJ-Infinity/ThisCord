@@ -1,4 +1,4 @@
-# RJDiscord
+# ThisCord
 
 ## ALPHA VERSION DOSENT WORK WITHOUT MODFICATION
 first in src/main.py put in the path into the PATH variable in the top

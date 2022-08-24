@@ -62,8 +62,9 @@ class ElectronComunicator:
 			if self.name in proc.name():
 				found = True
 				cmdArgs = proc.cmdline()
-				if (("--remote-debugging-port=" + str(self.port).zfill(4)) in cmdArgs):
-					return ElectronComunicator.OpenStates.DebugOpen
+				for arg in cmdArgs:
+					if arg.startswith("--remote-debugging-port") and arg.endswith(str(self.port)):
+						return ElectronComunicator.OpenStates.DebugOpen
 		return ElectronComunicator.OpenStates.DefaultOpen if found else ElectronComunicator.OpenStates.NotOpen
 	def kill_app(self):
 		if (self.electron_process != None):
@@ -72,8 +73,9 @@ class ElectronComunicator:
 		for proc in psutil.process_iter():
 			if self.name in proc.name():
 				cmdArgs = proc.cmdline()
-				if (("--remote-debugging-port=" + str(self.port).zfill(4)) in cmdArgs):
-					return proc
+				for arg in cmdArgs:
+					if arg.startswith("--remote-debugging-port") and arg.endswith(str(self.port)):
+						return proc
 
 	def find_first_open_process(self):
 		for proc in psutil.process_iter():

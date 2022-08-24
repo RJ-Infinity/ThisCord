@@ -83,8 +83,8 @@ if __name__ == "__main__":
 		try:
 			for w in discordDebugger.get_windows():
 				print(w)
-				discordDebugger.run_code(w, """fetch('http://127.0.0.1:5000/bootloader.js').then((response) => response.text()).then(data => eval(data));""")
+				discordDebugger.run_code(w, """fetch('http://127.0.0.1:2829/bootloader.js').then((response) => response.text()).then(data => eval(data));""")
 		except requests.exceptions.ConnectionError:
 			print("Error: The electron app failed the debug connection (posibly not in debug mode)",file=sys.stderr)
 			sys.exit(1)
-	server.run(debug=False)
+	server.run(debug=False,port=2829)

@@ -63,31 +63,51 @@ window.ThisCord = {
 			headers: new Headers({
 				"Content-Type": "application/json"
 			})
-		})
+		});
 	},
 	getFile(file){return fetch('http://127.0.0.1:2829/scripts'+file)}
-}
-fetch("http://127.0.0.1:2829/filesList").then(response=>response.json()).then(
-	files=>Promise.all(
-		files["files"]
-		.filter(file=>file.substring(file.length - 3) == ".js")
-		.map(file=>window.ThisCord.parsePath(file))
-		.map(file => fetch('http://127.0.0.1:2829/scripts'+file)
-		.then((response) => response.text())
-		.then(data =>{
-			ThisCord.modules[file] = {};
-			ThisCord.modules[file].exports = false;
-			ThisCord.modules[file].ctx = {};
-			ThisCord.modules[file].function =
-				(new Function("using","exports","ctx",data+"\n//# sourceURL=http://127.0.0.1:2829/scripts"+file));
-		}))
-	).then(_=>
-		files["files"].filter(file=>file.substring(file.length - 3) == ".js").map(file=>ThisCord.using("main").from(file)).forEach(main=>{
-			if (typeof main === "function"){
-				main();
-			}
-		})
-	)
-);
-
+};
+(function (loops){
+	if(document.querySelector(".container-1eFtFS")==null){
+		console.log("Discord not fully loaded.  Trying again in 0.25 seconds.")
+		setTimeout(arguments.callee, 250, loops+1);
+		//if it fails retry untill it works
+		return;
+	}else{
+		fetch("http://127.0.0.1:2829/filesList")
+		.then(response=>response.json())
+		.then(
+			files=>Promise.all(
+				files["files"]
+				.filter(file=>file.substring(file.length - 3) == ".js")
+				.map(file=>window.ThisCord.parsePath(file))
+				.map(
+					file=>fetch('http://127.0.0.1:2829/scripts'+file)
+					.then((response) => response.text())
+					.then(data =>{
+						ThisCord.modules[file] = {};
+						ThisCord.modules[file].exports = false;
+						ThisCord.modules[file].ctx = {};
+						ThisCord.modules[file].function = (new Function(
+							"using",
+							"exports",
+							"ctx",
+							data+"\n//# sourceURL=http://127.0.0.1:2829/scripts"+file
+						));
+					})
+				)
+			)
+			.then(
+				_=>files["files"]
+				.filter(file=>file.substring(file.length - 3) == ".js")
+				.map(file=>ThisCord.using("main").from(file))
+				.forEach(main=>{
+					if (typeof main === "function"){
+						main();
+					}
+				})
+			)
+		);
+	}
+})(0)
 //# sourceURL=http://127.0.0.1:2829/bootloader.js

@@ -74,8 +74,13 @@ window.ThisCord = {
 };
 (function (loops){
 	if(document.querySelector(".container-1eFtFS")==null){
-		console.log("Discord not fully loaded.  Trying again in 0.25 seconds.")
-		setTimeout(arguments.callee, 250, loops+1);
+		if (loops<20){
+			time = 250
+		}else{
+			time=(1+((loops-20)*(loops-20)*0.01))*250
+		}
+		console.log(`Discord not fully loaded.  Trying again in ${time/1000} seconds.`)
+		setTimeout(arguments.callee, time, loops+1);
 		//if it fails retry untill it works
 		return;
 	}else{

@@ -87,4 +87,4 @@ function addPage(name,template){
 function removePage(name){delete ctx.pages[name];}
 hooks.AddSettingsHook(addToSettings);
 
-exports(addPage,removePage);
+exports({addPage,removePage});

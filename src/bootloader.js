@@ -15,6 +15,7 @@ window.ThisCord = {
 				window.ThisCord.modules[filename].function(
 					window.ThisCord.using,
 					window.ThisCord.exports,
+					window.ThisCord.exportAs,
 					window.ThisCord.modules[filename].ctx
 				);
 
@@ -35,8 +36,12 @@ window.ThisCord = {
 		if (window.ThisCord.modules[window.ThisCord.currentModule] == undefined){
 			throw "Error: should not ever be called EVER";
 		}
+		if (typeof obj !== "object"){
+			throw "Error: the exports function takes a obj"
+		}
 		window.ThisCord.modules[window.ThisCord.currentModule].exports = {...window.ThisCord.modules[window.ThisCord.currentModule].exports, ...obj};
 	},
+	exportAs: (obj, name)=>window.ThisCord.exports({[name]:obj}),
 	parsePath(path){
 		newPath = [];
 		path = path.replaceAll("\\","/");
@@ -84,16 +89,16 @@ window.ThisCord = {
 				.map(
 					file=>fetch('http://127.0.0.1:2829/scripts'+file)
 					.then((response) => response.text())
-					.then(data =>{
-						ThisCord.modules[file] = {};
-						ThisCord.modules[file].exports = false;
-						ThisCord.modules[file].ctx = {};
-						ThisCord.modules[file].function = (new Function(
+					.then(data =>ThisCord.modules[file] = {
+						exports: false,
+						ctx: {},
+						function: (new Function(
 							"using",
 							"exports",
+							"exportAs",
 							"ctx",
 							data+"\n//# sourceURL=http://127.0.0.1:2829/scripts"+file
-						));
+						))
 					})
 				)
 			)
@@ -101,11 +106,8 @@ window.ThisCord = {
 				_=>files["files"]
 				.filter(file=>file.substring(file.length - 3) == ".js")
 				.map(file=>ThisCord.using("main").from(file))
-				.forEach(main=>{
-					if (typeof main === "function"){
-						main();
-					}
-				})
+				.filter(main=>typeof main === "function")
+				.forEach(main=>main())
 			)
 		);
 	}

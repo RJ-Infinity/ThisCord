@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 PATH = "C:\\Users\\rjinf\\AppData\\Local\\Discord"
-WAIT = 2
 
 import os
 import sys
@@ -11,7 +10,8 @@ from flask import Flask,send_file,request,send_from_directory
 from flask_cors import CORS, cross_origin
 import requests
 from time import sleep
-
+from threading import Thread
+import base64
 
 server = Flask(__name__)
 cors = CORS(server)
@@ -28,7 +28,7 @@ def launchDiscord():
 		EComunic.kill_app() #if it is open but not in debug mode close it
 	if open != ElectronComunicator.OpenStates.DebugOpen:
 		EComunic.launch() # if it isnt in debug mode it is closed as it should have been closed previously
-		sleep(WAIT)
+		# sleep(WAIT)
 	return EComunic
 
 @server.route("/bootloader.js")
@@ -63,7 +63,7 @@ def get_mime_type(url):
 	return contentType
 
 @server.route('/portal',methods=['POST'])
-def catch_all():
+def portalRequest():
 	data = json.loads(request.data)
 	if "url" not in data:
 		return "{\"error\":\"there was no url component to the data\"}", 400
@@ -71,20 +71,35 @@ def catch_all():
 		return "{\"error\":\"the url component to the data was not a string\"}", 400
 	url = data["url"]
 	return server.response_class(get_data_stream(url), mimetype=get_mime_type(url))
+@server.route('/portal/<urlB64>')
+def portalUrl(urlB64:str):
+	url = base64.b64decode(urlB64.replace("-","/"))
+	return server.response_class(get_data_stream(url), mimetype=get_mime_type(url))
 
+class Return:
+	def __init__(self):
+		self.returned = False
+		self.returnValue = None
+	def Return(self,value=None):
+		print("returned "+str(value))
+		self.returned = True
+		self.returnValue = value
 
-
-
-
+def mainLaunch(r):
+	discordDebugger = launchDiscord()
+	try:
+		for w in discordDebugger.get_windows():
+			print(w)
+			discordDebugger.run_code(w, """fetch('http://127.0.0.1:2829/bootloader.js').then((response) => response.text()).then(data => eval(data));""")
+	except requests.exceptions.ConnectionError:
+		print("Error: The electron app failed the debug connection (posibly not in debug mode)",file=sys.stderr)
+		return r.Return(False)
+	return r.Return(True)
 
 if __name__ == "__main__":
 	if "--no-inject" not in sys.argv:
-		discordDebugger = launchDiscord()
-		try:
-			for w in discordDebugger.get_windows():
-				print(w)
-				discordDebugger.run_code(w, """fetch('http://127.0.0.1:2829/bootloader.js').then((response) => response.text()).then(data => eval(data));""")
-		except requests.exceptions.ConnectionError:
-			print("Error: The electron app failed the debug connection (posibly not in debug mode)",file=sys.stderr)
-			sys.exit(1)
+		ITR = Return()
+		injectThread = Thread(target = mainLaunch,args=(ITR,))
+		injectThread.start()
 	server.run(debug=False,port=2829)
+	

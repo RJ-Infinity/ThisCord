@@ -20,10 +20,12 @@ template.innerHTML = `
 `
 
 AddToSettings.addPage("testing",template)
-
 function testFn(el){
-	var contentEl = el.getElementsByClassName("messageContent-2t3eCI")[0]
-	contentEl.innerText = contentEl.innerText + "(modified)"
+	var contentEl = el.getElementsByClassName("messageContent-2t3eCI")[0].firstChild;
+	console.log(contentEl);
+	if (contentEl.nodeType == 3){
+		contentEl.data = contentEl.data + "(modified)"
+	}
 }
 hooks = using("AddMessageLoadedHook","ForEachMessage").from("/hooks.js");
 hooks.ForEachMessage(testFn);

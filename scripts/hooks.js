@@ -1,3 +1,5 @@
+
+//settingsHook=====================================================================================
 ctx.settingsHook = document.querySelector(".layer-86YKbF.baseLayer-W6S8cY");
 ctx.settingsOpen = ctx.settingsHook.classList.contains("stop-animations");
 ctx.settingsHooks = []
@@ -19,9 +21,36 @@ function AddSettingsHook(f){
 	ctx.settingsHooks.push(f);
 }
 function RemoveSettingsHook(f){
-	if (array.indexOf(f) > -1) {
-		array.splice(array.indexOf(f), 1);
+	if (ctx.settingsHooks.indexOf(f) > -1) {
+		ctx.settingsHooks.splice(ctx.settingsHooks.indexOf(f), 1);
 	}
 }
 function SettingsOpen(){return ctx.settingsOpen;}
 exports({AddSettingsHook,RemoveSettingsHook,SettingsOpen});
+//messageLoadedHook=============================================================================
+ctx.messageLoadedHooks = [];
+new MutationObserver(records=>records.forEach(
+	record => Array
+	.from(record.addedNodes)
+	.filter(el=>el.nodeName == "LI" && el.classList.contains("messageListItem-ZZ7v6g"))
+	.forEach(el=>ctx.messageLoadedHooks.forEach(fn => fn(el)))
+)).observe(document.querySelector(".content-1SgpWY"), {childList: true, subtree: true});
+
+function AddMessageLoadedHook(f){
+	if (typeof f!="function"){
+		throw "Error f must be a function";
+	}
+	ctx.messageLoadedHooks.push(f);
+}
+function RemoveMessageLoadedHook(f){
+	if (ctx.messageLoadedHooks.indexOf(f) > -1) {
+		ctx.messageLoadedHooks.splice(ctx.messageLoadedHooks.indexOf(f), 1);
+	}
+}
+function ForEachMessage(f){
+	if (typeof f!="function"){
+		throw "Error f must be a function";
+	}
+	document.querySelectorAll("LI.messageListItem-ZZ7v6g").forEach((el)=>f(el))
+}
+exports({AddMessageLoadedHook,RemoveMessageLoadedHook,ForEachMessage});

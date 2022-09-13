@@ -1,5 +1,5 @@
-imgModal = using("ShowImageModal").from("./imageModal.js")
-hooks = using("ForEveryMessage").from("/hooks.js");
+var imgModal = using("ShowImageModal").from("./imageModal.js")
+var hooks = using("ForEveryMessage").from("/hooks.js");
 
 
 var svgHandler = el=>Array.from(el.querySelectorAll(".text-sm-normal-3Zj3Iv.footer-GXWBBp > a"))

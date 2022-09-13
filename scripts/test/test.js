@@ -9,7 +9,7 @@ document.querySelector(".wordmarkWindows-2dq6rw.wordmark-2u86JB").appendChild(((
 document.querySelector(".wordmarkWindows-2dq6rw.wordmark-2u86JB").style.fontSize = "1em";
 
 
-AddToSettings = using("addPage").from("/AddToSettings.js")
+var AddToSettings = using("addPage").from("/AddToSettings.js")
 
 template = document.createElement("template")
 template.innerHTML = `
@@ -23,7 +23,7 @@ AddToSettings.addPage("testing",template)
 
 //testing the message hook
 
-// hooks = using("ForEveryMessage").from("/hooks.js");
+// var hooks = using("ForEveryMessage").from("/hooks.js");
 // hooks.ForEveryMessage(function (el){
 // 	var contentEl = el.getElementsByClassName("messageContent-2t3eCI")[0].firstChild;
 // 	console.log(el.getElementsByClassName("messageContent-2t3eCI"));

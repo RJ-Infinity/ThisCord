@@ -1,10 +1,11 @@
-hooks = using("AddSettingsHook","SettingsOpen").from("/hooks.js")
+var hooks = using("AddSettingsHook","SettingsOpen").from("/hooks.js")
 
 ctx.pages = {}
 
 function eitherPageClicked(e){
 	document.querySelectorAll("[ThisCordSettingsElement]").forEach(el=>el.remove());
-	if (ctx.customSelected != undefined){
+	if (ctx.customSelected != undefined && ctx.customSelected != e.target){
+		//if we arent clicking ourself and the custom selected exitst
 		ctx.customSelected.classList.remove("selected-g-kMVV")
 	}
 }
@@ -25,9 +26,15 @@ function pageClicked(e){
 	wrapper.appendChild(ctx.pages[e.target.innerText].content.cloneNode(true));
 	content.appendChild(wrapper);
 }
+function detectLeavingProfile(){
+
+}
 function defaultPageClicked(e){
 	console.log(e.target)
 	console.log(e.target.innerText)
+	if (e.target.firstChild.data == "Profiles"){
+		setTimeout(detectLeavingProfile);
+	}
 
 	if (//if the button dosent change the page dont remove the content
 		e.target.innerText == "What's New" ||

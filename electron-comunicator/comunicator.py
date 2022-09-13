@@ -37,7 +37,7 @@ class ElectronComunicator:
 		self.__port=value
 		self.__ERB = ERB("localhost",self.port)
 
-	def launch(self):
+	def launch(self,args = []):
 		self.electron_process = Popen([
 			(
 				os.path.join(
@@ -54,7 +54,8 @@ class ElectronComunicator:
 					self.name
 				)
 			),
-			"--remote-debugging-port="+str(self.port).zfill(5)
+			"--remote-debugging-port="+str(self.port).zfill(5),
+			*args
 		],shell=True,creationflags=0x00000008|0x00000200)
 	def is_already_open(self)->ElectronComunicator.OpenStates:
 		found = False

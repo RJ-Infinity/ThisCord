@@ -17,7 +17,7 @@ server = Flask(__name__)
 cors = CORS(server)
 server.config['CORS_HEADERS'] = 'Content-Type'
 
-def launchDiscord():
+def launchDiscord(args):
 	port = 8473
 	EComunic = ElectronComunicator("Discord",None,PATH,port,True)
 	EComunic.use_most_recent_version()
@@ -27,7 +27,7 @@ def launchDiscord():
 	if open == ElectronComunicator.OpenStates.DefaultOpen:
 		EComunic.kill_app() #if it is open but not in debug mode close it
 	if open != ElectronComunicator.OpenStates.DebugOpen:
-		EComunic.launch() # if it isnt in debug mode it is closed as it should have been closed previously
+		EComunic.launch(args) # if it isnt in debug mode it is closed as it should have been closed previously
 		# sleep(WAIT)
 	return EComunic
 
@@ -85,8 +85,8 @@ class Return:
 		self.returned = True
 		self.returnValue = value
 
-def mainLaunch(r):
-	discordDebugger = launchDiscord()
+def mainLaunch(r,args):
+	discordDebugger = launchDiscord(args)
 	try:
 		for w in discordDebugger.get_windows():
 			print(w)
@@ -96,10 +96,20 @@ def mainLaunch(r):
 		return r.Return(False)
 	return r.Return(True)
 
+def parseArgs(args:list[str]):
+	flags = []
+	discordArgs = []
+	for arg in args:
+		if arg != "--" or len(discordArgs) == 0:
+			flags.append(arg)
+		else:
+			discordArgs.append(arg)
+	return flags,discordArgs
+
 if __name__ == "__main__":
-	if "--no-inject" not in sys.argv:
+	flags, args = parseArgs(sys.argv)
+	if "--no-inject" not in flags:
 		ITR = Return()
-		injectThread = Thread(target = mainLaunch,args=(ITR,))
+		injectThread = Thread(target = mainLaunch,args=(ITR,args,))
 		injectThread.start()
 	server.run(debug=False,port=2829)
-	

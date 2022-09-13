@@ -25,6 +25,9 @@ window.ThisCord = {
 			if (window.ThisCord.modules[filename] == undefined){
 				throw "Error: should not ever be called EVER";
 			}else{
+				if (args.length == 1 && args[0] == "*"){
+					return {...window.ThisCord.modules[filename].exports};
+				}
 				args.forEach(arg=>{
 					rv[arg] = window.ThisCord.modules[filename].exports[arg]
 				});

@@ -27,6 +27,12 @@ function RemoveSettingsHook(f){
 }
 function SettingsOpen(){return ctx.settingsOpen;}
 exports({AddSettingsHook,RemoveSettingsHook,SettingsOpen});
+
+//messageMenuHook==================================================================================
+
+//".selected-2LX7Jy"get selected message query selector
+// document.querySelectorAll(".appDevToolsWrapper-1QxdQf>div>.layerContainer-2v_Sit")
+
 //messageLoadedHook=============================================================================
 ctx.messageLoadedHooks = [];
 new MutationObserver(records=>records.forEach(
@@ -47,10 +53,15 @@ function RemoveMessageLoadedHook(f){
 		ctx.messageLoadedHooks.splice(ctx.messageLoadedHooks.indexOf(f), 1);
 	}
 }
-function ForEachMessage(f){
+function ForEachLoadedMessage(f){
 	if (typeof f!="function"){
 		throw "Error f must be a function";
 	}
 	document.querySelectorAll("LI.messageListItem-ZZ7v6g").forEach((el)=>f(el))
 }
-exports({AddMessageLoadedHook,RemoveMessageLoadedHook,ForEachMessage});
+function ForEveryMessage(f){
+	ForEachLoadedMessage(f);
+	AddMessageLoadedHook(f);
+}
+exports({AddMessageLoadedHook,RemoveMessageLoadedHook,ForEachLoadedMessage,ForEveryMessage});
+

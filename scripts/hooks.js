@@ -26,6 +26,7 @@ function RemoveSettingsHook(f){
 	}
 }
 function SettingsOpen(){return ctx.settingsOpen;}
+// document.querySelector(".item-3XjbnG.themed-2-lozF") // server settings
 exports({AddSettingsHook,RemoveSettingsHook,SettingsOpen});
 
 //messageMenuHook==================================================================================

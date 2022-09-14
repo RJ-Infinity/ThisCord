@@ -1,4 +1,4 @@
-var hooks = using("AddSettingsHook","SettingsOpen").from("/hooks.js")
+var hooks = using("/hooks.js")
 
 ctx.pages = {}
 

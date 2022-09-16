@@ -25,6 +25,9 @@ window.ThisCord = {
 			
 			window.ThisCord.currentModule = caller;
 		}
+		if (window.ThisCord.modules[filename].type == "json"){
+			return window.ThisCord.modules[filename].exports;
+		}//json can come in non object format
 		return {...window.ThisCord.modules[filename].exports};
 	},
 	exports(obj){
@@ -67,30 +70,8 @@ window.ThisCord = {
 	},
 	fetchScript(file){return fetch("http://127.0.0.1:2829/scripts"+file)},
 	generateModule(file){
-		// if (file.substring(file.length - 5) == ".wasm"){//not yet completly suported
-		// 	ThisCord.modules[file] = {
-		// 		type: "wasm",
-		// 		ctx: {}
-		// 	};
-		// 	return WebAssembly
-		// 	.instantiateStreaming(
-		// 		ThisCord.fetchScript(file),
-		// 		{
-		// 			global:{
-		// 				window,
-		// 			},
-		// 			ThisCord:{
-		// 				using: window.ThisCord.using,
-		// 				exports: window.ThisCord.exports,
-		// 				exportAs: window.ThisCord.exportAs,
-		// 				ctx: window.ThisCord.modules[file].ctx,
-		// 			},
-		// 		}
-		// 	)
-		// 	.then(console.log)
-		// 	.then(obj => ThisCord.modules[file].exports = obj.instance.exports);
-		// }
-		return ThisCord.fetchScript(file)
+		return ThisCord
+		.fetchScript(file)
 		.then(response => response.text())
 		.then(data => {
 			if (file.substring(file.length - 3) == ".js"){

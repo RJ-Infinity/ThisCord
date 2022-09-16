@@ -5,6 +5,7 @@ PATH = "C:\\Users\\rjinf\\AppData\\Local\\Discord"
 import os
 import sys
 import json
+import io
 from comunicator import ElectronComunicator
 from flask import Flask,send_file,request,send_from_directory
 from flask_cors import CORS, cross_origin
@@ -12,6 +13,7 @@ import requests
 from time import sleep
 from threading import Thread
 import base64
+import websocket
 
 server = Flask(__name__)
 cors = CORS(server)
@@ -90,9 +92,12 @@ def mainLaunch(r,args):
 	try:
 		for w in discordDebugger.get_windows():
 			print(w)
-			discordDebugger.run_code(w, """fetch('http://127.0.0.1:2829/bootloader.js').then((response) => response.text()).then(data => eval(data));""")
+			try:
+				discordDebugger.run_code(w, """fetch('http://127.0.0.1:2829/bootloader.js').then((response) => response.text()).then(data => eval(data));""")
+			except websocket._exceptions.WebSocketBadStatusException:
+				print("Error: The injection failed standard discord opended")
 	except requests.exceptions.ConnectionError:
-		print("Error: The electron app failed the debug connection (posibly not in debug mode)",file=sys.stderr)
+		print("Error: The electron app failed the debug connection (posibly not in debug mode)",file=ErrorFile)
 		return r.Return(False)
 	return r.Return(True)
 
@@ -100,16 +105,38 @@ def parseArgs(args:list[str]):
 	flags = []
 	discordArgs = []
 	for arg in args:
-		if arg != "--" or len(discordArgs) == 0:
+		if arg != "--" and len(discordArgs) == 0:
 			flags.append(arg)
 		else:
 			discordArgs.append(arg)
-	return flags,discordArgs
+	print(discordArgs)
+	return flags,discordArgs[1:]
+
+class popupIO(io.StringIO):
+	def __init__(self, title:str, mirrorIo:io.StringIO=None):
+		self.title = title
+		self.mirrorIo = mirrorIo
+	def write(self, text: str):
+		if self.mirrorIo != None:
+			self.mirrorIo.write(text)
+		if os.name == "nt":
+			import ctypes
+			ctypes.windll.user32.MessageBoxW(0, text, self.title, 1)
+		# if os.name == ""
+	def read(self,*args,**kwargs):
+		return self.mirrorIo.read(*args,**kwargs)
+
 
 if __name__ == "__main__":
-	flags, args = parseArgs(sys.argv)
-	if "--no-inject" not in flags:
-		ITR = Return()
-		injectThread = Thread(target = mainLaunch,args=(ITR,args,))
-		injectThread.start()
-	server.run(debug=False,port=2829)
+	os.chdir(os.path.dirname(__file__))
+	ErrorFile = popupIO("ThisCord", sys.stderr)
+	try:
+		flags, args = parseArgs(sys.argv)
+		if "--no-inject" not in flags:
+			ITR = Return()
+			injectThread = Thread(target = mainLaunch,args=(ITR,args,))
+			injectThread.start()
+		server.run(debug=False,port=2829)
+	except KeyboardInterrupt:
+		print("Exiting",file=ErrorFile)
+

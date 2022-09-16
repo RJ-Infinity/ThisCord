@@ -25,7 +25,7 @@ window.ThisCord = {
 			
 			window.ThisCord.currentModule = caller;
 		}
-		return window.ThisCord.createClone(window.ThisCord.modules[filename].exports);
+		return {...window.ThisCord.modules[filename].exports};
 	},
 	exports(obj){
 		if (window.ThisCord.modules[window.ThisCord.currentModule] == undefined){
@@ -65,78 +65,63 @@ window.ThisCord = {
 			})
 		});
 	},
-	getFile(file){return fetch('http://127.0.0.1:2829/scripts'+file)},
+	getFile(file){return fetch("http://127.0.0.1:2829/scripts"+file)},
 	generateModule(file){
-		if (file.substring(file.length - 5) == ".wasm"){
-			const importObject = {
-				imports: { imported_func: (arg) => console.log(arg) },
-			};
-			WebAssembly.instantiateStreaming(fetch("simple.wasm"), importObject).then(
-				(obj) => obj.instance.exports.exported_func()
-			);
-			return {
+		if (file.substring(file.length - 5) == ".wasm"){//not yet completly suported
+			ThisCord.modules[file] = {
 				type: "wasm",
-				exports: false,
-				ctx: {},
-				function: ()=>{throw "Error No Suport For Wasm Yet"}//TEMP
-			}
+				ctx: {}
+			};
+			return WebAssembly
+			.instantiateStreaming(
+				ThisCord.getFile(file),
+				{
+					global:{
+						window,
+					},
+					ThisCord:{
+						using: window.ThisCord.using,
+						exports: window.ThisCord.exports,
+						exportAs: window.ThisCord.exportAs,
+						ctx: window.ThisCord.modules[file].ctx,
+					},
+				}
+			)
+			.then(console.log)
+			.then(obj => ThisCord.modules[file].exports = obj.instance.exports);
 		}
-		fetch('http://127.0.0.1:2829/scripts'+file)
-		.then((response) => response.text())
+		return ThisCord.getFile(file)
+		.then(response => response.text())
 		.then(data => {
 			if (file.substring(file.length - 3) == ".js"){
-				return {
-				type: "js",
-				exports: false,
-				ctx: {},
-				function: (new Function(
-					"using",
-					"exports",
-					"exportAs",
-					"ctx",
-					data+"\n//# sourceURL=http://127.0.0.1:2829/scripts"+file
+				ThisCord.modules[file] = {
+					type: "js",
+					exports: false,
+					ctx: {},
+					function: (new Function(
+						"using",
+						"exports",
+						"exportAs",
+						"ctx",
+						data+"\n//# sourceURL=http://127.0.0.1:2829/scripts"+file
 					))
-				}
+				};
+				return;
 			}
 			if (file.substring(file.length - 5) == ".json"){
-				return {
+				ThisCord.modules[file] = {
 					type: "json",
 					exports:JSON.parse(data)
-				}
+				};
+				return;
 			}
 		})
-		.catch(
-			error=>{
-				console.error(error)
-				console.error(file)
-			}
-		)
-	},
-	createClone(obj){
-		switch (Object.prototype.toString.call(obj)){
-			case "[object Array]":{
-				return [...obj]
-			}
-			case "[object Object]":{
-				return Object.assign(Object.create(Object.getPrototypeOf(orig)), orig);
-			}
-			case "[object Boolean]":
-			case "[object String]":
-			case "[object Undefined]":
-			case "[object Null]":
-			case "[object Function]":
-			case "[object Number]":{
-				return obj;
-			}
-			default:{
-				console.error(
-					"Warning prototype type "+
-					Object.prototype.toString.call(obj)+
-					" not suported not cloning object"
-				);
-				return obj;
-			}
-		}
+		// .catch(
+		// 	error=>{
+		// 		console.error(error)
+		// 		console.error(file)
+		// 	}
+		// )
 	}
 };
 
@@ -157,7 +142,13 @@ window.ThisCord = {
 		.then(
 			files=>Promise.all(
 				files["files"]
-				.filter(file=>file.substring(file.length - 3) == ".js" || file.substring(file.length - 5) == ".json")
+				.filter(
+					file=>
+					file.substring(file.length - 3) == ".js" ||
+					file.substring(file.length - 5) == ".json" ||
+					file.substring(file.length - 5) == ".wasm"
+				)
+				// .filter(file=>!console.log(file))
 				.map(file=>window.ThisCord.parsePath(file))
 				.map(window.ThisCord.generateModule)
 			)

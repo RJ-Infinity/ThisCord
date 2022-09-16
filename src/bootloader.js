@@ -65,32 +65,32 @@ window.ThisCord = {
 			})
 		});
 	},
-	getFile(file){return fetch("http://127.0.0.1:2829/scripts"+file)},
+	fetchScript(file){return fetch("http://127.0.0.1:2829/scripts"+file)},
 	generateModule(file){
-		if (file.substring(file.length - 5) == ".wasm"){//not yet completly suported
-			ThisCord.modules[file] = {
-				type: "wasm",
-				ctx: {}
-			};
-			return WebAssembly
-			.instantiateStreaming(
-				ThisCord.getFile(file),
-				{
-					global:{
-						window,
-					},
-					ThisCord:{
-						using: window.ThisCord.using,
-						exports: window.ThisCord.exports,
-						exportAs: window.ThisCord.exportAs,
-						ctx: window.ThisCord.modules[file].ctx,
-					},
-				}
-			)
-			.then(console.log)
-			.then(obj => ThisCord.modules[file].exports = obj.instance.exports);
-		}
-		return ThisCord.getFile(file)
+		// if (file.substring(file.length - 5) == ".wasm"){//not yet completly suported
+		// 	ThisCord.modules[file] = {
+		// 		type: "wasm",
+		// 		ctx: {}
+		// 	};
+		// 	return WebAssembly
+		// 	.instantiateStreaming(
+		// 		ThisCord.fetchScript(file),
+		// 		{
+		// 			global:{
+		// 				window,
+		// 			},
+		// 			ThisCord:{
+		// 				using: window.ThisCord.using,
+		// 				exports: window.ThisCord.exports,
+		// 				exportAs: window.ThisCord.exportAs,
+		// 				ctx: window.ThisCord.modules[file].ctx,
+		// 			},
+		// 		}
+		// 	)
+		// 	.then(console.log)
+		// 	.then(obj => ThisCord.modules[file].exports = obj.instance.exports);
+		// }
+		return ThisCord.fetchScript(file)
 		.then(response => response.text())
 		.then(data => {
 			if (file.substring(file.length - 3) == ".js"){
@@ -145,8 +145,7 @@ window.ThisCord = {
 				.filter(
 					file=>
 					file.substring(file.length - 3) == ".js" ||
-					file.substring(file.length - 5) == ".json" ||
-					file.substring(file.length - 5) == ".wasm"
+					file.substring(file.length - 5) == ".json"
 				)
 				// .filter(file=>!console.log(file))
 				.map(file=>window.ThisCord.parsePath(file))

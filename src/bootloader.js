@@ -133,9 +133,18 @@ window.ThisCord = {
 				.map(window.ThisCord.generateModule)
 			)
 			.then(
-				_=>files["files"]
+				_=>files["mains"]
+				.map(window.ThisCord.parsePath)
 				.filter(file=>file.substring(file.length - 3) == ".js")
+				.filter(file=>{
+					var exists = files["files"].map(window.ThisCord.parsePath).includes(file);
+					if (!exists){
+						console.error(`Skiping ${file} because it does not exist`);
+					}
+					return exists;
+				})
 				.map(file=>ThisCord.using(file))
+				.map(exported=>exported.main)
 				.filter(main=>typeof main === "function")
 				.forEach(main=>main())
 			)

@@ -12,3 +12,4 @@ document.querySelector(".wordmarkWindows-2dq6rw.wordmark-2u86JB").appendChild(((
 })())
 document.querySelector(".wordmarkWindows-2dq6rw.wordmark-2u86JB").style.fontSize = "1em";
 
+exports({main:()=>{console.log("RunningMain")}})

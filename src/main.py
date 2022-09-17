@@ -45,7 +45,13 @@ def files():
 	for path, _, files in os.walk(os.path.join("..","scripts")):
 		for file in files:
 			files_list.append(os.path.join(path, file)[len(os.path.join("..","scripts","")):].replace("\\","/"))
-	return json.dumps({"files":files_list})
+	mains = []
+	if os.path.exists(os.path.join("..","main.json")):
+		try:
+			mains = json.load(open(os.path.join("..","main.json"),"r"))
+		except json.decoder.JSONDecodeError:
+			mains = []
+	return json.dumps({"files":files_list, "mains":mains})
 
 
 @server.route("/scripts/<path:filename>")

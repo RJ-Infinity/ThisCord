@@ -3,6 +3,9 @@ class Enum{
 	// always return the name of the first one defined
 
 	// note a construcor should not be defined for cusotom Enum classes
+
+	// note if you want an alias property without a value then set the value of the second one
+	// defined to the name of the first as a string
 	static #alowedConstructor = false;
 	static #Enums = []
 	static initEnum(EnumClass){

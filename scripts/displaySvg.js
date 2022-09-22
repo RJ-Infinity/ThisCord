@@ -2,7 +2,8 @@ var imgModal = using("./imageModal.js")
 var hooks = using("/hooks.js");
 
 
-var svgHandler = el=>Array.from(el.querySelectorAll(".text-sm-normal-3Zj3Iv.footer-GXWBBp > a"))
+var svgHandler = el=>Array
+.from(el.querySelectorAll(".text-sm-normal-3Zj3Iv.footer-GXWBBp > a"))
 .filter(
 	el=>el
 	.getAttribute("href")

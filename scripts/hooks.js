@@ -43,6 +43,17 @@ new MutationObserver(records=>records.forEach(
 	.forEach(el=>ctx.messageLoadedHooks.forEach(fn => fn(el)))
 )).observe(document.querySelector(".content-1SgpWY"), {childList: true, subtree: true});
 
+new MutationObserver(records=>records.forEach(
+	record=>Array
+	.from(record.addedNodes)
+	.filter(el=>el.nodeName == "MAIN" && el.classList.contains("chatContent-3KubbW"))
+	.forEach(
+		el=>Array
+		.from(el.querySelectorAll("ol.scrollerInner-2PPAp2>li.messageListItem-ZZ7v6g"))
+		.forEach(el=>ctx.messageLoadedHooks.forEach(fn => fn(el)))
+	)
+)).observe(document.querySelector(".content-1SgpWY"), {childList: true, subtree: true});
+
 function AddMessageLoadedHook(f){
 	if (typeof f!="function"){
 		throw "Error f must be a function";

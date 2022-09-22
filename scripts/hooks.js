@@ -31,8 +31,45 @@ exports({AddSettingsHook,RemoveSettingsHook,SettingsOpen});
 
 //messageMenuHook==================================================================================
 
-//".selected-2LX7Jy"get selected message query selector
-// document.querySelectorAll(".appDevToolsWrapper-1QxdQf>div>.layerContainer-2v_Sit")
+const runMessageHook = el=>{
+	if (el.id != "message" && el.id != "message-actions"){
+		return;
+	}
+	if (document.querySelectorAll(".selected-2LX7Jy").length > 1){
+		console.warn("WARNING: multiple messages selected retrying in 0.25 seconds");
+		setTimeout(runMessageHook,250,el);
+		return;
+	}
+	if (document.querySelectorAll(".selected-2LX7Jy").length == 0){
+		console.error("ERROR: no selected messages hook not fired");
+		return;
+	}
+	ctx.messageMenuHook.forEach(f=>f(el,document.querySelector(".selected-2LX7Jy")));
+}
+
+ctx.messageMenuHook = [];
+var messageMenuMutationObserver = new MutationObserver(records=>records.forEach(
+	record => Array
+	.from(record.addedNodes)
+	.forEach(el=>el.querySelectorAll(".menu-1QACrS[role=menu]").forEach(runMessageHook))
+));
+Array
+.from(document.querySelectorAll(".appDevToolsWrapper-1QxdQf>div>.layerContainer-2v_Sit"))
+.forEach(el=>messageMenuMutationObserver.observe(el, {childList: true, subtree: true}));
+
+function AddMessageMenuHook(f){
+	if (typeof f!="function"){
+		throw "Error f must be a function"
+	}
+	ctx.messageMenuHook.push(f);
+}
+function RemoveMessageMenuHook(f){
+	if (ctx.messageMenuHook.indexOf(f) > -1) {
+		ctx.messageMenuHook.splice(ctx.messageMenuHook.indexOf(f), 1);
+	}
+}
+
+exports({AddMessageMenuHook,RemoveMessageMenuHook});
 
 //messageLoadedHook=============================================================================
 ctx.messageLoadedHooks = [];
@@ -69,7 +106,7 @@ function ForEachLoadedMessage(f){
 	if (typeof f!="function"){
 		throw "Error f must be a function";
 	}
-	document.querySelectorAll("LI.messageListItem-ZZ7v6g").forEach((el)=>f(el))
+	document.querySelectorAll("LI.messageListItem-ZZ7v6g").forEach((el)=>f(el));
 }
 function ForEveryMessage(f){
 	ForEachLoadedMessage(f);

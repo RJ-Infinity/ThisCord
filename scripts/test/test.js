@@ -24,6 +24,8 @@ AddToSettings.addPage("testing",template);
 // });
 
 
+// hooks.AddMessageMenuHook(console.log);
+
 // test2Json = using("test2.json");//this uses a relative import
 // console.log(test2Json);
 

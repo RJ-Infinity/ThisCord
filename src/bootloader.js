@@ -3,7 +3,7 @@ window.ThisCord = {
 	modules:{},
 	currentModule:"/bootloader.js",
 	using(file){
-		filename = window.ThisCord.parsePath(file);
+		var filename = window.ThisCord.parsePath(file);
 		if (window.ThisCord.modules[filename] == undefined){
 			throw `Error: the file ${file} does not exist`;
 		}
@@ -13,7 +13,7 @@ window.ThisCord = {
 		){
 			window.ThisCord.modules[filename].exports = {}
 
-			caller = window.ThisCord.currentModule;
+			var caller = window.ThisCord.currentModule;
 			window.ThisCord.currentModule = filename;
 
 			window.ThisCord.modules[filename].function(

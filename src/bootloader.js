@@ -108,12 +108,13 @@ window.ThisCord = {
 
 (function (loops){
 	if(document.querySelector(".container-1eFtFS")==null){
+		//TODO: ask the server to re-inject if it dosent load for long enough
 		if (loops<20){
 			time = 250
 		}else{
 			time=(1+((loops-20)*(loops-20)*0.01))*250
 		}
-		console.log(`Discord not fully loaded.  Trying again in ${time/1000} seconds.`)
+		console.warn(`Discord not fully loaded.  Trying again in ${time/1000} seconds.`)
 		setTimeout(arguments.callee, time, loops+1);
 		//if it fails retry untill it works
 		return;
@@ -139,7 +140,7 @@ window.ThisCord = {
 				.filter(file=>{
 					var exists = files["files"].map(window.ThisCord.parsePath).includes(file);
 					if (!exists){
-						console.error(`Skiping ${file} because it does not exist`);
+						console.warn(`Skiping ${file} because it does not exist`);
 					}
 					return exists;
 				})

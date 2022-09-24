@@ -17,7 +17,7 @@ import websocket
 
 server = Flask(__name__)
 cors = CORS(server)
-server.config['CORS_HEADERS'] = 'Content-Type'
+server.config["CORS_HEADERS"] = "Content-Type"
 
 def launchDiscord(args):
 	port = 8473
@@ -70,7 +70,7 @@ def get_mime_type(url):
 	contentType = response.headers['content-type']
 	return contentType
 
-@server.route('/portal',methods=['POST'])
+@server.route("/portal",methods=["POST"])
 def portalRequest():
 	data = json.loads(request.data)
 	if "url" not in data:
@@ -79,7 +79,7 @@ def portalRequest():
 		return "{\"error\":\"the url component to the data was not a string\"}", 400
 	url = data["url"]
 	return server.response_class(get_data_stream(url), mimetype=get_mime_type(url))
-@server.route('/portal/<urlB64>')
+@server.route("/portal/<urlB64>")
 def portalUrl(urlB64:str):
 	url = base64.b64decode(urlB64.replace("-","/"))
 	return server.response_class(get_data_stream(url), mimetype=get_mime_type(url))
@@ -103,7 +103,7 @@ def mainLaunch(r,args):
 			except websocket._exceptions.WebSocketBadStatusException:
 				print("Error: The injection failed standard discord opended")
 	except requests.exceptions.ConnectionError:
-		print("Error: The electron app failed the debug connection (posibly not in debug mode)",file=ErrorFile)
+		print("Error: The electron app failed the debug connection (posibly not in debug mode)",file=sys.stderr)
 		return r.Return(False)
 	return r.Return(True)
 
@@ -133,9 +133,15 @@ class popupIO(io.StringIO):
 		return self.mirrorIo.read(*args,**kwargs)
 
 
+import ctypes
 if __name__ == "__main__":
 	os.chdir(os.path.dirname(__file__))
-	ErrorFile = popupIO("ThisCord", sys.stderr)
+	oldStdErr = sys.stderr
+	oldStdOut = sys.stdout
+	# ErrorFile = popupIO("ThisCord", sys.stderr)
+	# logger = open("logging.log","w")
+	# sys.stderr = logger
+	# sys.stdout = logger
 	try:
 		flags, args = parseArgs(sys.argv)
 		if "--no-inject" not in flags:
@@ -144,5 +150,7 @@ if __name__ == "__main__":
 			injectThread.start()
 		server.run(debug=False,port=2829)
 	except KeyboardInterrupt:
-		print("Exiting",file=ErrorFile)
-
+		ctypes.windll.user32.MessageBoxW(0, "exiting keybard interupt", "DISCORD DEBUG", 1)
+		print("Exiting",file=sys.stderr)
+	sys.stderr = oldStdErr
+	sys.stdout = oldStdOut

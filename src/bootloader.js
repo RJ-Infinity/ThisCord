@@ -28,12 +28,20 @@
 					var caller = window.ThisCord.currentModule;
 					window.ThisCord.currentModule = filename;
 
-					window.ThisCord.modules[filename].function(
-						window.ThisCord.using,
-						window.ThisCord.exports,
-						window.ThisCord.exportAs,
-						window.ThisCord.modules[filename].ctx
-					);
+					try{
+						window.ThisCord.modules[filename].function(
+							window.ThisCord.using,
+							window.ThisCord.exports,
+							window.ThisCord.exportAs,
+							window.ThisCord.modules[filename].ctx
+						);
+					}catch (e){
+						console.error(e)
+						console.warn(`loading '${filename}' failed skipping`)
+						window.ThisCord.modules[filename].exports = false;
+						window.ThisCord.currentModule = caller;
+						return {};
+					}
 					
 					window.ThisCord.currentModule = caller;
 				}
@@ -87,17 +95,25 @@
 				.then(response => response.text())
 				.then(data => {
 					if (file.substring(file.length - 3) == ".js"){
-						ThisCord.modules[file] = {
-							type: "js",
-							exports: false,
-							ctx: {},
-							function: (new Function(
+						try{
+							var func = new Function(
 								"using",
 								"exports",
 								"exportAs",
 								"ctx",
 								data+"\n//# sourceURL=http://127.0.0.1:2829/scripts"+file
-							))
+							)
+						}catch(e){
+							if (e instanceof SyntaxError){
+								console.error("Syntax Error at '"+file+"' creating empty module")
+								var func = function(){}
+							}
+						}
+						ThisCord.modules[file] = {
+							type: "js",
+							exports: false,
+							ctx: {},
+							function: func
 						};
 						return;
 					}

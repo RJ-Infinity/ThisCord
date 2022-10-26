@@ -1,5 +1,6 @@
 [
 	"/ShowLoaded.js",
 	"(DONT LOAD)/test/test.js",
-	"/displaySvg.js"
+	"/displaySvg.js",
+	"/showCrossServerReplys.js"
 ]

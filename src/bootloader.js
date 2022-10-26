@@ -12,6 +12,7 @@
 		return;
 	}else{
 		window.ThisCord = {
+			DiscordModules:[],
 			modules:{},
 			currentModule:"/bootloader.js",
 			using(file){
@@ -78,7 +79,10 @@
 				});
 				return "/"+newPath.join("/");
 			},
-			fetchThroughPortal(url){
+			fetchThroughPortal(url,useB64Encode=false){
+				if (useB64Encode){
+					return fetch(`http://127.0.0.1:2829/portal/${window.btoa(url).replaceAll("/","-")}`);
+				}
 				return fetch("http://127.0.0.1:2829/portal", {
 					method:"post",
 					body:JSON.stringify({url}),
@@ -87,6 +91,20 @@
 						"Content-Type": "application/json"
 					})
 				});
+			},
+			updateModules(){
+				webpackChunkdiscord_app.push(
+					[
+						[''],
+						{},
+						e => {
+							window.ThisCord.DiscordModules=[];
+							for(let c in e.c){
+								window.ThisCord.DiscordModules.push(e.c[c])
+							}
+						}
+					]
+				)
 			},
 			fetchScript(file){return fetch("http://127.0.0.1:2829/scripts"+file)},
 			generateModule(file){

@@ -1,5 +1,6 @@
 var hooks = using("/hooks.js");
-var Modules = using("/modules.js");
+var modules = using("/modules.js");
+var discordApi = using("/discordAPI.js");
 
 function ParseContent(content){
 	content = content
@@ -11,14 +12,8 @@ function ParseContent(content){
 
 function messageLink(el,paths){
 	paths.shift();
-	fetch(
-		`https://discordapp.com/api/v6/channels/${paths[0]}/messages?limit=1&around=${paths[1]}`,
-		{headers: {
-			"Content-Type": "application/json",
-			"Authorization": Modules.getToken()
-		}}
-	)
-	.then(response => response.json())
+	discordApi
+	.getMessage(paths[0],paths[1])
 	.then(json => {
 		MessageEmbedTemplate = document.createElement("template");
 		MessageEmbedTemplate.innerHTML = `
@@ -51,9 +46,9 @@ function messageLink(el,paths){
 			}
 		</style>
 		<div class="ThisCord-embed">
-			<img class="ThisCord-embed-icon" src="https://cdn.discordapp.com/avatars/${json[0]["author"]["id"]}/${json[0]["author"]["avatar"]}">
-			<b>${json[0]["author"]["username"]}</b>
-			<p>${ParseContent(json[0]["content"])}</p>
+			<img class="ThisCord-embed-icon" src="https://cdn.discordapp.com/avatars/${json["author"]["id"]}/${json["author"]["avatar"]}">
+			<b>${json["author"]["username"]}</b>
+			<p>${ParseContent(json["content"])}</p>
 		</div>
 		`
 		el.innerText = "";
@@ -64,9 +59,8 @@ function channelLink(el,paths){
 	
 }
 function serverLink(el,paths){
-	if (paths[0] == "@me"){
-
-	}
+	if (paths[0] == "@me"){return;}
+	
 }
 var messageLinkHandler = el=>Array
 .from(el.querySelectorAll("a"))

@@ -22,8 +22,9 @@ function getMessage(channelID, messageID){
 			"Authorization": modules.getToken()
 		}}
 	)
+	.then(response=>!response.ok?{json:()=>[]}:response)
 	.then(response => response.json())
-	.then(json=>json.length == 0?null:json[0])
+	.then(json=>json.length == 0?null:json[0]);
 	return ctx.MessageCache[channelID][messageID]
 }
 function getGuild(guildID){
@@ -36,7 +37,9 @@ function getGuild(guildID){
 			"Content-Type": "application/json",
 			"Authorization": modules.getToken()
 		}}
-	).then(response => response.json())
+	)
+	.then(response=>!response.ok?{json:()=>null}:response)
+	.then(response => response.json())
 	return ctx.GuildCache[guildID];
 }
 function getChannels(guildID){
@@ -49,7 +52,9 @@ function getChannels(guildID){
 			"Content-Type": "application/json",
 			"Authorization": modules.getToken()
 		}}
-	).then(response => response.json())
+	)
+	.then(response=>!response.ok?{json:()=>null}:response)
+	.then(response => response.json());
 	return ctx.ChannelCache[guildID];
 }
 function getProfile(profileID){
@@ -62,7 +67,9 @@ function getProfile(profileID){
 			"Content-Type": "application/json",
 			"Authorization": modules.getToken()
 		}}
-	).then(response => response.json())
+	)
+	.then(response=>!response.ok?{json:()=>null}:response)
+	.then(response => response.json());
 	return ctx.ProfileCache[profileID];
 }
 

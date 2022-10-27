@@ -53,6 +53,10 @@ function messageLink(el,paths){
 	discordApi
 	.getMessage(paths[0],paths[1])
 	.then(json => {
+		if (json == null){
+			console.log(paths.join("/")+" not a valid message");
+			return;
+		}
 		addCSS()
 		MessageEmbedTemplate = document.createElement("template");
 		MessageEmbedTemplate.innerHTML = `

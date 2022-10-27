@@ -23,7 +23,7 @@ function getMessage(channelID, messageID){
 		}}
 	)
 	.then(response => response.json())
-	.then(json=>json[0])
+	.then(json=>json.length == 0?null:json[0])
 	return ctx.MessageCache[channelID][messageID]
 }
 function getGuild(guildID){

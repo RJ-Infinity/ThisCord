@@ -5,6 +5,69 @@ var discordApi = using("/discordAPI.js");
 function ParseContent(content){
 	content = Sanitise(content)
 	.split("\n")[0];
+	content = content.replaceAll("\\\\","\\").replaceAll("\\/","/");
+	content.match(/\|\|.*?\|\|/g)?.forEach(
+		m=>content = content.replace(
+			m,
+			`<span class=\"spoilerText-27bIiA hidden-3B-Rum\">${
+				m.substring(2,m.length-2)
+			}</span>`
+		)
+	);
+	content.match(/__.*?__/g)?.forEach(
+		m=>content = content.replace(m,`<u>${m.substring(2,m.length-2)}</u>`)
+	);
+	content.match(/\*\*.*?\*\*/g)?.forEach(
+		m=>content = content.replace(m,`<b>${m.substring(2,m.length-2)}</b>`)
+	);
+	content.match(/\*.*?\*/g)?.forEach(
+		m=>content = content.replace(m,`<i>${m.substring(1,m.length-1)}</i>`)
+	);
+	content.match(/&lt;\/[^:]+:[0-9]+&gt;/g)?.forEach(
+		m=>content = content.replace(
+			m,
+			`<span class=\"commandMention wrapper-1ZcZW- mention\">${
+				m.substring(0,m.indexOf(":")).replaceAll("&lt;","")
+			}</span>`
+		)
+	);
+	var spentEmojis = [];
+	Array.from(content).forEach(char=>{
+		if ((!spentEmojis.includes(char)) && modules.testEmoji(char)){
+			spentEmojis.push(char);
+			content = content.replaceAll(
+				char,
+				`<img aria-label="${
+					char
+				}" src="${
+					modules.getEmojiURL(modules.ToCodePoint(char))
+				}" alt="${
+					char
+				}" draggable="false" class="ThisCordEmoji" data-type="emoji">`
+			);
+		}
+	});
+	content.match(/&lt;a?:[^:]+:[0-9]+&gt;/g)?.forEach(
+		m=>{
+			var n = m[4] == "a"?m.replace("a",""):m;
+			content = content.replace(
+				m,
+				`<img aria-label=":${
+					n.replaceAll("&lt;:","").substring(
+						0,n.replaceAll("&lt;:","").indexOf(":")
+					).replaceAll("&gt;","").replaceAll(":","")
+				}:" src="https://cdn.discordapp.com/emojis/${
+					n.replaceAll("&lt;:","").substring(
+						n.replaceAll("&lt;:","").indexOf(":")
+					).replaceAll("&gt;","").replaceAll(":","")
+				}.${m[4] == "a"?"gif":"png"}" alt=":${
+					n.replaceAll("&lt;:","").substring(
+						0,n.replaceAll("&lt;:","").indexOf(":")
+					).replaceAll("&gt;","").replaceAll(":","")
+				}:" class="ThisCordEmoji">`
+			)
+		}
+	);
 	return content;
 }
 function Sanitise(content){
@@ -18,9 +81,6 @@ function addCSS(){
 	MessageEmbedTemplate = document.createElement("template");
 	MessageEmbedTemplate.innerHTML = `
 	<style id="ThisCordEmbedCSS">
-		div:has(a>.ThisCord-embed){
-			height: 2.5em;
-		}
 		.ThisCord-embed{
 			background-color: rgb(242, 243, 245);
 			border-radius: 5px;
@@ -34,7 +94,7 @@ function addCSS(){
 		.ThisCord-embed b{
 			min-width: max-content;
 		}
-		.ThisCord-embed img{
+		.ThisCord-embed-icon{
 			border-radius: 50%;
 			aspect-ratio: 1/1;
 			height: 1.5em;
@@ -43,6 +103,13 @@ function addCSS(){
 			margin: 0;
 			height: 1.2em;
 			overflow: hidden;
+			position: relative;
+		}
+		.ThisCordEmoji{
+			position:relative;
+			height: 1.2em;
+			aspect-ratio: 1/1;
+			margin-bottom: -3px;
 		}
 	</style>`
 	document.head.appendChild(MessageEmbedTemplate.content.cloneNode(true));

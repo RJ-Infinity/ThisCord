@@ -1,8 +1,9 @@
 var modules = using("/modules.js");
 
-ctx.MessageCache = {}
-ctx.GuildCache = {}
-ctx.ChannelCache = {}
+ctx.MessageCache = {};
+ctx.GuildCache = {};
+ctx.ChannelCache = {};
+ctx.ProfileCache = {};
 
 function getMessage(channelID, messageID){
 	if (
@@ -51,5 +52,18 @@ function getChannels(guildID){
 	).then(response => response.json())
 	return ctx.ChannelCache[guildID];
 }
+function getProfile(profileID){
+	if (ctx.ProfileCache[profileID] != undefined){
+		return ctx.ProfileCache[profileID];
+	}
+	ctx.ProfileCache[profileID] = fetch(
+		`https://discord.com/api/v9/users/${profileID}/profile`,
+		{headers: {
+			"Content-Type": "application/json",
+			"Authorization": modules.getToken()
+		}}
+	).then(response => response.json())
+	return ctx.ProfileCache[profileID];
+}
 
-exports({getMessage,getGuild,getChannels})
+exports({getMessage,getGuild,getChannels,getProfile})

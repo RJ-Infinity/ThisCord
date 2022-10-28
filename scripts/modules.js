@@ -17,7 +17,15 @@ function ToCodePoint(emojiChar,seperator){
 }
 function getEmojiURL(emojiCodePoint){
 	CheckModules();
-	return ThisCord.DiscordModules.find(m=>m.id==553895).exports("./"+emojiCodePoint+".svg")
+	return ThisCord.DiscordModules.find(m=>(
+		m?.exports !== void 0 &&
+		typeof m.exports == "function" &&
+		m.exports?.resolve !== void 0 &&
+		typeof m.exports.resolve == "function" &&
+		m.exports?.keys !== void 0 &&
+		typeof m.exports.keys == "function" &&
+		m.id==553895
+	)).exports("./"+emojiCodePoint+".svg")
 }
 function testEmoji(e){
 	CheckModules();

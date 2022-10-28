@@ -82,7 +82,7 @@ function addCSS(){
 	MessageEmbedTemplate.innerHTML = `
 	<style id="ThisCordEmbedCSS">
 		.ThisCord-embed{
-			background-color: rgb(242, 243, 245);
+			background-color: var(--background-secondary);
 			border-radius: 5px;
 			display: flex;
 			gap: 10px;

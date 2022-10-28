@@ -2,6 +2,46 @@ var hooks = using("/hooks.js");
 var modules = using("/modules.js");
 var discordApi = using("/discordAPI.js");
 
+function resolveMentions(el){
+	Array.from(el.querySelectorAll("[ThisCordUnresolvedMention]")).forEach(
+		el=>discordApi.getProfile(el.getAttribute("userid")).then(json=>{
+			if (json == null){
+				el.innerText = `<@${el.getAttribute("userid")}>`;
+				return;
+			}
+			el.innerText = `@${Sanitise(json.user.username)}`;
+		})
+	);
+}
+function resolveChannelMentions(el, serverID){
+	Array.from(el.querySelectorAll("[ThisCordUnresolvedChannelMention]")).forEach(
+		el=>discordApi.getChannels(serverID).then(json=>{
+			if (
+				json == null ||
+				json.find(r=>r.id == el.getAttribute("getChannels")) == undefined
+			){
+				el.innerText = `<#${el.getAttribute("getChannels")}>`;
+				return;
+			}
+			el.innerText = `#${Sanitise(json.find(r=>r.id == el.getAttribute("getChannels")).name)}`;
+		})
+	);
+}
+function resolveRoleMentions(el, serverID){
+	Array.from(el.querySelectorAll("[ThisCordUnresolvedRoleMention]")).forEach(
+		el=>discordApi.getGuild(serverID).then(json=>{
+			if (
+				json == null ||
+				json.roles.find(r=>r.id == el.getAttribute("RoleID")) == undefined
+			){
+				el.innerText = `<@&${el.getAttribute("RoleID")}>`;
+				return;
+			}
+			el.innerText = `@${Sanitise(json.roles.find(r=>r.id == el.getAttribute("RoleID")).name)}`;
+		})
+	);
+}
+
 function ParseContent(content){
 	content = Sanitise(content)
 	.split("\n")[0];
@@ -22,6 +62,31 @@ function ParseContent(content){
 	);
 	content.match(/\*.*?\*/g)?.forEach(
 		m=>content = content.replace(m,`<i>${m.substring(1,m.length-1)}</i>`)
+	);
+
+	content.match(/&lt;@!?[0-9]+&gt;/g)?.forEach(
+		m=>content = content.replace(
+			m,
+			`<span class=\"mention wrapper-1ZcZW- mention\" ThisCordUnresolvedMention UserID=\"${
+				m.replaceAll("&lt;","").replaceAll("&gt;","").replaceAll("@","").replaceAll("!","")
+			}\"></span>`
+		)
+	);
+	content.match(/&lt;#[0-9]+&gt;/g)?.forEach(
+		m=>content = content.replace(
+			m,
+			`<span class=\"channelMention wrapper-1ZcZW- mention\" ThisCordUnresolvedChannelMention getChannels=\"${
+				m.replaceAll("&lt;","").replaceAll("&gt;","").replaceAll("#","")
+			}\"></span>`
+		)
+	);
+	content.match(/&lt;@&amp;[0-9]+&gt;/g)?.forEach(
+		m=>content = content.replace(
+			m,
+			`<span class=\"roleMention-11Aaqi wrapper-1ZcZW- mention\" ThisCordUnresolvedRoleMention RoleID=\"${
+				m.replaceAll("&lt;","").replaceAll("&gt;","").replaceAll("@","").replaceAll("&amp;","")
+			}\"></span>`
+		)
 	);
 	content.match(/&lt;\/[^:]+:[0-9]+&gt;/g)?.forEach(
 		m=>content = content.replace(
@@ -72,6 +137,7 @@ function ParseContent(content){
 }
 function Sanitise(content){
 	return content
+	.replaceAll("&","&amp;")
 	.replaceAll("<","&lt;")
 	.replaceAll(">","&gt;");
 }
@@ -116,9 +182,8 @@ function addCSS(){
 }
 
 function messageLink(el,paths){
-	paths.shift();
 	discordApi
-	.getMessage(paths[0],paths[1])
+	.getMessage(paths[1],paths[2])
 	.then(json => {
 		if (json == null){
 			console.log(paths.join("/")+" not a valid message");
@@ -135,6 +200,9 @@ function messageLink(el,paths){
 		`
 		el.innerText = "";
 		el.appendChild(MessageEmbedTemplate.content.cloneNode(true));
+		resolveMentions(el);
+		resolveChannelMentions(el,paths[0]);
+		resolveRoleMentions(el,paths[0]);
 	})
 }
 function channelLink(el,paths){

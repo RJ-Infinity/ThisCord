@@ -1,5 +1,5 @@
-function CheckModules(){
-	if (ThisCord.DiscordModules.length < 1){
+function CheckModules(force=false){
+	if (force || ThisCord.DiscordModules.length < 1){
 		window.ThisCord.updateModules();
 	}
 }
@@ -16,7 +16,7 @@ function ToCodePoint(emojiChar,seperator){
 	return ThisCord.DiscordModules.find(m=>m.id==742358).exports.Z.convert.toCodePoint(emojiChar,seperator);
 }
 function getEmojiURL(emojiCodePoint){
-	CheckModules();
+	CheckModules(true);//seems to load later
 	return ThisCord.DiscordModules.find(m=>(
 		m?.exports !== void 0 &&
 		typeof m.exports == "function" &&

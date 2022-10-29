@@ -82,7 +82,36 @@ function messageLink(el,paths){
 	})
 }
 function channelLink(el,paths){
-	
+	if (paths[0] == "@me"){
+		discordApi.getChannel(paths[1]).then(json=>{
+			MessageEmbedTemplate = document.createElement("template");
+			MessageEmbedTemplate.innerHTML = `
+			<div class="ThisCord-embed">
+				<img class="ThisCord-embed-icon" src="https://cdn.discordapp.com/avatars/${json["recipients"][0]["id"]}/${json["recipients"][0]["avatar"]}">
+				<b>${messageRenderer.Sanitise(json["recipients"][0]["username"])}</b>
+			</div>
+			`
+			el.innerText = "";
+			el.appendChild(MessageEmbedTemplate.content.cloneNode(true));
+		})
+		return;
+	}
+	discordApi.getGuild(paths[0]).then(json => discordApi.getChannels(paths[0]).then( channels => {
+		addCSS()
+		if (json == null || channels == null){return;}
+		var channel = channels.find(c=>c.id==paths[1]);
+		if (channel == undefined){return;}
+		MessageEmbedTemplate = document.createElement("template");
+		MessageEmbedTemplate.innerHTML = `
+		<div class="ThisCord-embed">
+			<img class="ThisCord-embed-icon" src="https://cdn.discordapp.com/icons/${json["id"]}/${json["icon"]}">
+			<b>${messageRenderer.Sanitise(json["name"])}</b>
+			<p>${messageRenderer.Sanitise(channel["name"])}</p>
+		</div>
+		`
+		el.innerText = "";
+		el.appendChild(MessageEmbedTemplate.content.cloneNode(true));
+	}));
 }
 function serverLink(el,paths){
 	if (paths[0] == "@me"){return;}

@@ -1,12 +1,9 @@
 from __future__ import annotations
-
-PATH = "C:\\Users\\rjinf\\AppData\\Local\\Discord"
-
 import os
+import inspect
 import sys
 import json
 import io
-from comunicator import ElectronComunicator
 from flask import Flask,send_file,request,send_from_directory
 from flask_cors import CORS, cross_origin
 import requests
@@ -14,6 +11,14 @@ from time import sleep
 from threading import Thread
 import base64
 import websocket
+
+USER_PATH = os.path.expanduser("~")
+PATH = f"{USER_PATH}\\AppData\\Local\\Discord"
+FILENAME = inspect.getframeinfo(inspect.currentframe()).filename
+EXECUTING_PATH = os.path.dirname(os.path.abspath(FILENAME))
+COMMUNICATOR_PATH = EXECUTING_PATH.replace("src","electron-comunicator")
+sys.path.insert(0, COMMUNICATOR_PATH)
+from comunicator import ElectronComunicator
 
 server = Flask(__name__)
 cors = CORS(server)

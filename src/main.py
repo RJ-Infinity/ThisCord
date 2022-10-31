@@ -1,6 +1,5 @@
 from __future__ import annotations
 import os
-import inspect
 import sys
 import json
 import io
@@ -14,7 +13,7 @@ import websocket
 
 USER_PATH = os.path.expanduser("~")
 PATH = f"{USER_PATH}\\AppData\\Local\\Discord"
-FILENAME = inspect.getframeinfo(inspect.currentframe()).filename
+FILENAME = __file__
 EXECUTING_PATH = os.path.dirname(os.path.abspath(FILENAME))
 COMMUNICATOR_PATH = EXECUTING_PATH.replace("src","electron-comunicator")
 sys.path.insert(0, COMMUNICATOR_PATH)

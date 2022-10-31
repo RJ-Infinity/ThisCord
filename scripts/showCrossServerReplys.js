@@ -147,7 +147,7 @@ var messageLinkHandler = el => Array
 					serverLink,
 					channelLink,
 					messageLink
-				])[paths.length](el, paths);
+				])[paths.length](el, paths);
 			} catch (e) { }//TODO add error handling
 		}
 	);

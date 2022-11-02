@@ -73,6 +73,7 @@ function messageLink(el, paths) {
 			`: ""}
 		</div>
 		`;
+		el.style.display = "block";
 		el.innerText = "";
 		el.appendChild(MessageEmbedTemplate.content.cloneNode(true));
 		messageRenderer.resolveMentions(el);

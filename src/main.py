@@ -142,10 +142,10 @@ if __name__ == "__main__":
 	os.chdir(os.path.dirname(__file__))
 	oldStdErr = sys.stderr
 	oldStdOut = sys.stdout
-	# ErrorFile = popupIO("ThisCord", sys.stderr)
-	# logger = open("logging.log","w")
-	# sys.stderr = logger
-	# sys.stdout = logger
+	if sys.executable.endswith("pythonw.exe"):
+		logger = open("logging.log","w")
+		sys.stderr = logger
+		sys.stdout = logger
 	try:
 		flags, args = parseArgs(sys.argv)
 		if "--no-inject" not in flags:

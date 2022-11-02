@@ -38,6 +38,12 @@ function addCSS() {
 			aspect-ratio: 1/1;
 			margin-bottom: -3px;
 		}
+		.ThisCordChannelMentionIcon{
+			width: 1em;
+			height: 1em;
+			position: relative;
+			top: 0.1em;
+		}
 	</style>`;
 	document.head.appendChild(MessageEmbedTemplate.content.cloneNode(true));
 }
@@ -56,7 +62,7 @@ function messageLink(el, paths) {
 		<div class="ThisCord-embed">
 			<img class="ThisCord-embed-icon" src="https://cdn.discordapp.com/avatars/${json["author"]["id"]}/${json["author"]["avatar"]}">
 			<b>${messageRenderer.Sanitise(json["author"]["username"])}</b>
-			<p>${messageRenderer.ParseContent(json["content"])}</p>
+			<p>${messageRenderer.ParseContent(messageRenderer.Sanitise(json["content"]).split("\n")[0],false)}</p>
 			${(
 				json?.attachments?.length > 0 ||
 				json?.embeds?.length > 0 ||

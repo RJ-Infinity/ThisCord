@@ -1,6 +1,6 @@
-ctx.modalTemplate = document.createElement("template");
-ctx.modalTemplate.innerHTML = 
-`<style id="ThisCordStyle">
+AddCss = using("AddCss.js");
+
+AddCss.addCSS("ImageModal",`
 	@keyframes expand {
 		0%{
 			scale: 0;
@@ -29,8 +29,11 @@ ctx.modalTemplate.innerHTML =
 	#ThisCordImageWrapper.closing{
 		animation: fade .5s reverse;
 	}
-</style>
-<div id="ThisCordBackground" class="backdrop-2ByYRN withLayer-2VVmpp" style="opacity: 0.85; background: hsl(0, calc(var(--saturation-factor, 1) * 0%), 0%);"></div>
+`);
+
+ctx.modalTemplate = document.createElement("template");
+ctx.modalTemplate.innerHTML = 
+`<div id="ThisCordBackground" class="backdrop-2ByYRN withLayer-2VVmpp" style="opacity: 0.85; background: hsl(0, calc(var(--saturation-factor, 1) * 0%), 0%);"></div>
 <div id="ThisCordImageWrapper" class="layer-1Ixpg3">
 	<div class="focusLock-2tveLW" role="dialog" aria-label="Image" tabindex="-1" aria-modal="true">
 		<div class="modal-3Crloo root-g14mjS fullscreenOnMobile-ixj0e3" style="opacity: 1; transform: scale(1);">
@@ -78,6 +81,7 @@ function ShowImageModal(url,href){
 		el.setAttribute("ThisCordOldSyle",el.getAttribute("style")?el.getAttribute("style"):"");
 		el.setAttribute("style","display:none;");
 	});
+	AddCss.injectCSS("ImageModal");
 	document.querySelector("div+.layerContainer-2v_Sit").appendChild(modal);
 	document
 	.getElementById("ThisCordImg")

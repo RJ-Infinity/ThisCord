@@ -296,4 +296,11 @@ function ParseContent(content,shouldSanitise=true){
 	return content;
 }
 
-exports({ParseContent,resolveMentions,resolveChannelMentions,resolveRoleMentions,resolveRelativeTime,Sanitise});
+exports({
+	ParseContent,
+	resolveMentions,
+	resolveChannelMentions,
+	resolveRoleMentions,
+	resolveRelativeTime,
+	Sanitise
+});

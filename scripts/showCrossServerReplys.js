@@ -5,7 +5,8 @@ var messageRenderer = using("/MessageRenderer.js");
 
 function addCSS() {
 	if (document.getElementById("ThisCordEmbedCSS") !== null) { return; }
-	MessageEmbedTemplate = document.createElement("template");
+	var MessageEmbedTemplate = document.createElement("template");
+	// TODO: split the css into the correct file (i.e. some of this is related to the MessageRenderer.js)
 	MessageEmbedTemplate.innerHTML = `
 	<style id="ThisCordEmbedCSS">
 		.ThisCord-embed{
@@ -56,7 +57,8 @@ function messageLink(el, paths) {
 			console.log(paths.join("/") + " not a valid message");
 			return;
 		}
-		addCSS();
+		// TODO: switch to the new AddCss module
+		addCSS(); 
 		MessageEmbedTemplate = document.createElement("template");
 		MessageEmbedTemplate.innerHTML = `
 		<div class="ThisCord-embed">

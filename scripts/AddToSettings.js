@@ -26,16 +26,9 @@ function pageClicked(e){
 	wrapper.appendChild(ctx.pages[e.target.innerText].content.cloneNode(true));
 	content.appendChild(wrapper);
 }
-function detectLeavingProfile(){
-
-}
 function defaultPageClicked(e){
 	console.log(e.target)
 	console.log(e.target.innerText)
-	if (e.target.firstChild.data == "Profiles"){
-		setTimeout(detectLeavingProfile);
-	}
-
 	if (//if the button dosent change the page dont remove the content
 		e.target.innerText == "What's New" ||
 		e.target.getAttribute("aria-label")=="Log Out"||

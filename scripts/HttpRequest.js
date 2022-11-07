@@ -10,11 +10,14 @@ XMLHttpRequest.prototype.open = function (method, url, async, user, password) {
 }
 
 function addRequestIntercept(fn){
+	if (typeof f!="function"){
+		throw "Error f must be a function"
+	}
 	ctx.functions.push(fn);
 }
-function addRequestIntercept(fn){
+function removeRequestIntercept(fn){
 	if (ctx.functions.indexOf(fn) > -1) {
 		ctx.functions.splice(ctx.functions.indexOf(fn), 1);
 	}
 }
-exports({addRequestIntercept,addRequestIntercept});
+exports({addRequestIntercept,removeRequestIntercept});

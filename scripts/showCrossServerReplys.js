@@ -2,6 +2,17 @@ var hooks = using("/hooks.js");
 var modules = using("/modules.js");
 var discordApi = using("/discordAPI.js");
 var messageRenderer = using("/MessageRenderer.js");
+var AddToSettings = using("/AddToSettings.js");
+
+template = document.createElement("template");
+template.innerHTML = `
+<h1>Embeds for message Links</h1>
+
+<button> this is a button</button>
+<a href="https://google.com">link</a>
+`;
+
+AddToSettings.addPage("Embeds for message Links",template);
 
 function addCSS() {
 	if (document.getElementById("ThisCordEmbedCSS") !== null) { return; }

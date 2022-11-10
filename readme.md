@@ -6,7 +6,7 @@ first in src/main.py put in the path into the PATH variable in the top~~
 ~~this will generaly just be changing the username~~ this is no longer needed (thanks @titushmeader)
 ### How to install ThisCord:
 ```
-1. go to ```https://github.com/RJ-Infinity/ThisCord/releases```, and download the latest installer release
+1. go to https://github.com/RJ-Infinity/ThisCord/releases, and download the latest installer release
 2. open the installer and press "Install Thiscord" button
 3. open discord and thiscord should automatically attach
 ```

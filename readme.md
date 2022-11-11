@@ -1,15 +1,10 @@
 ![logo](https://raw.githubusercontent.com/RJ-Infinity/ThisCord/master/thiscordbanner.png)
 
-~~## ALPHA VERSION DOSENT WORK WITHOUT MODFICATION
-first in src/main.py put in the path into the PATH variable in the top~~
-
-~~this will generaly just be changing the username~~ this is no longer needed (thanks @titushmeader)
+## ALPHA VERSION
 ### How to install ThisCord:
-```
-1. go to https://github.com/RJ-Infinity/ThisCord/releases, and download the latest installer release
-2. open the installer and press "Install Thiscord" button
-3. open discord and thiscord should automatically attach
-```
+> 1. go to https://github.com/RJ-Infinity/ThisCord/releases, and download the latest installer release
+> 2. open the installer and press "Install Thiscord" button
+> 3. open discord and thiscord should automatically attach
 ### NOTE
 not tested with other discord mods so it might not work with then
 

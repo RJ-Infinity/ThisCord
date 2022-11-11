@@ -1,4 +1,11 @@
-var hooks = using("/hooks.js")
+var hooks = using("/hooks.js");
+var AddCss = using("/AddCss.js");
+
+AddCss.addCSS("Hidden",`.ThisCordSettingsHidden{
+	display:none!important;
+}`);
+AddCss.injectCSS("Hidden");
+
 
 ctx.pages = {}
 
@@ -12,36 +19,32 @@ function eitherPageClicked(e){
 
 function pageClicked(e){
 	eitherPageClicked(e);
-	ctx.previouslySelectedDoc = document.querySelector(".item-3XjbnG.selected-g-kMVV.themed-2-lozF");
+
+	var wrapper = document.createElement("div");
+	wrapper.classList.add("contentColumn-1C7as6");
+	wrapper.classList.add("contentColumnDefault-3eyv5o");
+	wrapper.toggleAttribute("ThisCordSettingsElement");
+	wrapper.appendChild(ctx.pages[e.target.innerText].content.cloneNode(true));
+
+	var settingsContent = document.querySelector(".contentColumn-1C7as6.contentColumnDefault-3eyv5o:not([ThisCordSettingsElement])")
+	settingsContent.parentElement.insertBefore(wrapper, settingsContent);
+	settingsContent.classList.add("ThisCordSettingsHidden");
+
+	ctx.previouslySelectedDoc = document.querySelector(".item-3XjbnG.selected-g-kMVV.themed-2-lozF") || ctx.previouslySelectedDoc;
 	ctx.previouslySelectedDoc.classList.remove("selected-g-kMVV");
 	e.target.classList.add("selected-g-kMVV");
 	ctx.customSelected = e.target;
-	var content = document.querySelector(".contentRegionScroller-2_GT_N.contentRegionShownSidebar-fHXkEg.auto-2K3UW5.scrollerBase-_bVAAt>.contentColumn-1C7as6.contentColumnDefault-3eyv5o");
-	Array.from(content.children).forEach(el=>{
-		el.setAttribute("ThisCordSettingsOldStyle",el.getAttribute("style")||"");
-		el.style = "display:none;";
-	});
-	var wrapper = document.createElement("div");
-	wrapper.toggleAttribute("ThisCordSettingsElement");
-	wrapper.appendChild(ctx.pages[e.target.innerText].content.cloneNode(true));
-	content.appendChild(wrapper);
 }
 function defaultPageClicked(e){
-	console.log(e.target)
-	console.log(e.target.innerText)
 	if (//if the button dosent change the page dont remove the content
-		e.target.innerText == "What's New" ||
-		e.target.getAttribute("aria-label")=="Log Out"||
+	e.target.innerText == "What's New" ||
+	e.target.getAttribute("aria-label")=="Log Out"||
 		e.target.innerText == "Log Out" ||
 		e.target.parentElement.innerText == "Log Out"
 	){return;}
+	document.querySelectorAll(".ThisCordSettingsHidden").forEach(el=>el.classList.remove("ThisCordSettingsHidden"));
 	eitherPageClicked(e);
-	if (e.target == ctx.previouslySelectedDoc){
-		ctx.previouslySelectedDoc.classList.add("selected-g-kMVV");
-		document.querySelectorAll("[ThisCordSettingsOldStyle]").forEach(el=>el.setAttribute("style",el.getAttribute("ThisCordSettingsOldStyle")))
-	}
 }
-
 function addToSettings(loops = 0){
 	if (hooks.SettingsOpen()){
 		if(loops > 20){return;}//if it fails over 20 times give up
@@ -50,6 +53,10 @@ function addToSettings(loops = 0){
 			//if it fails retry untill it works
 			return;
 		}
+
+		ctx.previouslySelectedDoc = null;
+		ctx.customSelected = null;
+
 		Array.from(document.querySelector(".side-2ur1Qk").children).forEach(element => {
 			if (element.innerText == "What's New"){
 				nextSettingsPageEl = element

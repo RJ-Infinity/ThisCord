@@ -79,18 +79,8 @@
 				});
 				return "/"+newPath.join("/");
 			},
-			fetchThroughPortal(url,useB64Encode=false){
-				if (useB64Encode){
-					return fetch(`http://127.0.0.1:2829/portal/${window.btoa(url).replaceAll("/","-")}`);
-				}
-				return fetch("http://127.0.0.1:2829/portal", {
-					method:"post",
-					body:JSON.stringify({url}),
-					mode: "cors",
-					headers: new Headers({
-						"Content-Type": "application/json"
-					})
-				});
+			fetchThroughPortal(url,object){
+				return fetch(`http://127.0.0.1:2829/portal/${window.btoa(url).replaceAll("/","-")}`,object);
 			},
 			updateModules(){
 				webpackChunkdiscord_app.push(

@@ -3,7 +3,7 @@ import os
 import sys
 import json
 import io
-from flask import Flask,send_file,request,send_from_directory
+from flask import Flask, send_file,request, send_from_directory, Response
 from flask_cors import CORS, cross_origin
 import requests
 from time import sleep
@@ -64,29 +64,37 @@ def scripts(filename):
 	return send_from_directory("..\\scripts\\",filename)
 
 
-def get_data_stream(url):
-	with requests.Session().get(url, headers=None, stream=True) as resp:
-		for data in resp.iter_content():
-			yield data
-
-def get_mime_type(url):
-	response = requests.Session().head(url)
-	contentType = response.headers['content-type']
-	return contentType
-
-@server.route("/portal",methods=["POST"])
-def portalRequest():
-	data = json.loads(request.data)
-	if "url" not in data:
-		return "{\"error\":\"there was no url component to the data\"}", 400
-	if type(data["url"]) == str:
-		return "{\"error\":\"the url component to the data was not a string\"}", 400
-	url = data["url"]
-	return server.response_class(get_data_stream(url), mimetype=get_mime_type(url))
-@server.route("/portal/<urlB64>")
+@server.route("/portal/<urlB64>", methods=['GET', 'POST', 'DELETE', 'PUT', 'PATCH'])
 def portalUrl(urlB64:str):
-	url = base64.b64decode(urlB64.replace("-","/"))
-	return server.response_class(get_data_stream(url), mimetype=get_mime_type(url))
+	# https://stackoverflow.com/a/36601467/15755351
+	resp = requests.request(
+		method=request.method,
+		url = base64.b64decode(urlB64.replace("-","/")),
+		headers={key: value for (key, value) in request.headers if key != 'Host'},
+		data=request.get_data(),
+		cookies=request.cookies,
+		allow_redirects=False)
+
+	excluded_headers = [
+		"content-encoding",
+		"content-length",
+		"transfer-encoding",
+		"connection"
+		"keep-alive",
+		"proxy-authenticate",
+		"proxy-authorization",
+		"te",
+		"trailers",
+		"upgrade"
+	]
+	headers = [
+		(name, value)for (name, value) in
+		resp.raw.headers.items()
+		if name.lower() not in excluded_headers
+	]
+
+	response = Response(resp.content, resp.status_code, headers)
+	return response
 
 class Return:
 	def __init__(self):

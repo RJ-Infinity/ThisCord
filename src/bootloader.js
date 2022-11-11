@@ -82,66 +82,62 @@
 			fetchThroughPortal(url,object){
 				return fetch(`http://127.0.0.1:2829/portal/${window.btoa(url).replaceAll("/","-")}`,object);
 			},
-			updateModules(){
-				// this is some webpack magic that was modified from
-				// https://stackoverflow.com/a/69868564/15755351
-				webpackChunkdiscord_app.push(
-					[
-						[''],
-						{},
-						e => {
-							window.ThisCord.DiscordModules=[];
-							for(let c in e.c){
-								window.ThisCord.DiscordModules.push(e.c[c])
-							}
+			// this is some webpack magic that was modified from
+			// https://stackoverflow.com/a/69868564/15755351
+			updateModules:()=>webpackChunkdiscord_app.push(
+				[
+					[''],
+					{},
+					e => {
+						window.ThisCord.DiscordModules=[];
+						for(let c in e.c){
+							window.ThisCord.DiscordModules.push(e.c[c])
 						}
-					]
-				)
-			},
-			fetchScript(file){return fetch("http://127.0.0.1:2829/scripts"+file)},
-			generateModule(file){
-				return ThisCord
-				.fetchScript(file)
-				.then(response => response.text())
-				.then(data => {
-					if (file.substring(file.length - 3) == ".js"){
-						try{
-							var func = new Function(
-								"using",
-								"exports",
-								"exportAs",
-								"ctx",
-								data+"\n//# sourceURL=http://127.0.0.1:2829/scripts"+file
-							)
-						}catch(e){
-							if (e instanceof SyntaxError){
-								console.error("Syntax Error at '"+file+"' creating empty module")
-								var func = function(){}
-							}
+					}
+				]
+			),
+			fetchScript:file=>fetch("http://127.0.0.1:2829/scripts"+file),
+			generateModule:file => ThisCord
+			.fetchScript(file)
+			.then(response => response.text())
+			.then(data => {
+				if (file.substring(file.length - 3) == ".js"){
+					try{
+						var func = new Function(
+							"using",
+							"exports",
+							"exportAs",
+							"ctx",
+							data+"\n//# sourceURL=http://127.0.0.1:2829/scripts"+file
+						)
+					}catch(e){
+						if (e instanceof SyntaxError){
+							console.error("Syntax Error at '"+file+"' creating empty module")
+							var func = function(){}
 						}
-						ThisCord.modules[file] = {
-							type: "js",
-							exports: false,
-							ctx: {},
-							function: func
-						};
-						return;
 					}
-					if (file.substring(file.length - 5) == ".json"){
-						ThisCord.modules[file] = {
-							type: "json",
-							exports:JSON.parse(data)
-						};
-						return;
-					}
-				})
-				// .catch(
-				// 	error=>{
-				// 		console.error(error)
-				// 		console.error(file)
-				// 	}
-				// )
-			}
+					ThisCord.modules[file] = {
+						type: "js",
+						exports: false,
+						ctx: {},
+						function: func
+					};
+					return;
+				}
+				if (file.substring(file.length - 5) == ".json"){
+					ThisCord.modules[file] = {
+						type: "json",
+						exports:JSON.parse(data)
+					};
+					return;
+				}
+			})
+			// .catch(
+			// 	error=>{
+			// 		console.error(error)
+			// 		console.error(file)
+			// 	}
+			// )
 		};
 		fetch("http://127.0.0.1:2829/filesList")
 		.then(response=>response.json())

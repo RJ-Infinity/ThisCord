@@ -83,6 +83,8 @@
 				return fetch(`http://127.0.0.1:2829/portal/${window.btoa(url).replaceAll("/","-")}`,object);
 			},
 			updateModules(){
+				// this is some webpack magic that was modified from
+				// https://stackoverflow.com/a/69868564/15755351
 				webpackChunkdiscord_app.push(
 					[
 						[''],

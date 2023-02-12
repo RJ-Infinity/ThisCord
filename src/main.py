@@ -160,7 +160,8 @@ if __name__ == "__main__":
 			ITR = Return()
 			injectThread = Thread(target = mainLaunch,args=(ITR,args,))
 			injectThread.start()
-		server.run(debug=False,port=2829)
+		if "--no-server" not in flags:
+			server.run(debug=False,port=2829)
 	except KeyboardInterrupt:
 		ctypes.windll.user32.MessageBoxW(0, "exiting keybard interupt", "DISCORD DEBUG", 1)
 		print("Exiting",file=sys.stderr)

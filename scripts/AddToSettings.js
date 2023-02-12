@@ -71,7 +71,7 @@ function addToSettings(loops = 0){
 		
 		header = document.createElement("DIV");
 		header.classList.add("header-2Kx1US");
-		header.classList.add("eyebrow-Ejf06y");
+		header.classList.add("eyebrow-1Shfyi");
 		header.innerText = "ThisCord";
 		document.querySelector(".side-2ur1Qk").insertBefore(header, nextSettingsPageEl.previousSibling);
 

@@ -1,9 +1,18 @@
 var imgModal = using("./imageModal.js")
 var hooks = using("/hooks.js");
+var modules = using("/modules.js");
 
+ctx.classes = {
+	footer:modules.getCssName("footer",["newMosaicStyle"])[0].className,
+	textSmNormal:modules.getCssName("text-sm/normal",[],55)[0].className,
+}
 
 var svgHandler = el=>Array
-.from(el.querySelectorAll(".text-sm-normal-3Zj3Iv.footer-GXWBBp > a"))
+.from(el.querySelectorAll(
+	"."+ctx.classes.textSmNormal+
+	"."+ctx.classes.footer+
+	" > a"
+))
 .filter(
 	el=>el
 	.getAttribute("href")

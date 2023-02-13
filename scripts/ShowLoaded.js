@@ -1,6 +1,9 @@
 console.log("LOADED")
 
-document.querySelector(".wordmarkWindows-2dq6rw.wordmark-2u86JB").appendChild((()=>{
+var modules = using("/modules.js");
+var wordmark = "."+modules.getCssName("wordmarkWindows")[0].className.replace(" ",".")
+
+document.querySelector(wordmark).appendChild((()=>{
 	var a =  document.createElement("span");
 	a.innerText = "(ThisCord)";
 	// vertical-align: text-top;
@@ -19,6 +22,6 @@ document.querySelector(".wordmarkWindows-2dq6rw.wordmark-2u86JB").appendChild(((
 	a.style.marginTop = "0.2em";
 	return a;
 })())
-document.querySelector(".wordmarkWindows-2dq6rw.wordmark-2u86JB").style.fontSize = "1em";
+document.querySelector(wordmark).style.fontSize = "1em";
 
 exports({main:()=>{console.log("RunningMain")}})

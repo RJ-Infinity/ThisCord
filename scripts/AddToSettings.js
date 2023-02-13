@@ -1,5 +1,6 @@
 var hooks = using("/hooks.js");
 var AddCss = using("/AddCss.js");
+var modules = using("/modules.js");
 
 AddCss.addCSS("Hidden",`.ThisCordSettingsHidden{
 	display:none!important;
@@ -9,11 +10,23 @@ AddCss.injectCSS("Hidden");
 
 ctx.pages = {}
 
+ctx.classes = {
+	selected:modules.getCssName("selected",["topPill"])[0].className,
+	contentColumn:modules.getCssName("contentColumn")[0].className,
+	contentColumnDefault:modules.getCssName("contentColumnDefault")[0].className,
+	item:modules.getCssName("item",["topPill"])[0].className,
+	themed:modules.getCssName("themed",["topPill"])[0].className,
+	side:modules.getCssName("side",["topPill"])[0].className,
+	separator:modules.getCssName("separator",["topPill"])[0].className,
+	header:modules.getCssName("header",["topPill"])[0].className,
+	eyebrow:modules.getCssName("eyebrow",[],55)[0].className,
+}
+
 function eitherPageClicked(e){
 	document.querySelectorAll("[ThisCordSettingsElement]").forEach(el=>el.remove());
 	if (ctx.customSelected != undefined && ctx.customSelected != e.target){
 		//if we arent clicking ourself and the custom selected exitst
-		ctx.customSelected.classList.remove("selected-g-kMVV")
+		ctx.customSelected.classList.remove(ctx.classes.selected)
 	}
 }
 
@@ -21,18 +34,26 @@ function pageClicked(e){
 	eitherPageClicked(e);
 
 	var wrapper = document.createElement("div");
-	wrapper.classList.add("contentColumn-1C7as6");
-	wrapper.classList.add("contentColumnDefault-3eyv5o");
+	wrapper.classList.add(ctx.classes.contentColumn);
+	wrapper.classList.add(ctx.classes.contentColumnDefault);
 	wrapper.toggleAttribute("ThisCordSettingsElement");
 	wrapper.appendChild(ctx.pages[e.target.innerText].content.cloneNode(true));
 
-	var settingsContent = document.querySelector(".contentColumn-1C7as6.contentColumnDefault-3eyv5o:not([ThisCordSettingsElement])")
+	var settingsContent = document.querySelector(
+		"."+ctx.classes.contentColumn+
+		"."+ctx.classes.contentColumnDefault+
+		":not([ThisCordSettingsElement])"
+	)
 	settingsContent.parentElement.insertBefore(wrapper, settingsContent);
 	settingsContent.classList.add("ThisCordSettingsHidden");
 
-	ctx.previouslySelectedDoc = document.querySelector(".item-3XjbnG.selected-g-kMVV.themed-2-lozF") || ctx.previouslySelectedDoc;
-	ctx.previouslySelectedDoc.classList.remove("selected-g-kMVV");
-	e.target.classList.add("selected-g-kMVV");
+	ctx.previouslySelectedDoc = document.querySelector(
+		"."+ctx.classes.selected+
+		"."+ctx.classes.item+
+		"."+ctx.classes.themed
+	) || ctx.previouslySelectedDoc;
+	ctx.previouslySelectedDoc.classList.remove(ctx.classes.selected);
+	e.target.classList.add(ctx.classes.selected);
 	ctx.customSelected = e.target;
 }
 function defaultPageClicked(e){
@@ -48,7 +69,7 @@ function defaultPageClicked(e){
 function addToSettings(loops = 0){
 	if (hooks.SettingsOpen()){
 		if(loops > 20){return;}//if it fails over 20 times give up
-		if(document.querySelector(".side-2ur1Qk")==null){
+		if(document.querySelector("."+ctx.classes.side)==null){
 			setTimeout(addToSettings, 250, loops+1);
 			//if it fails retry untill it works
 			return;
@@ -57,31 +78,31 @@ function addToSettings(loops = 0){
 		ctx.previouslySelectedDoc = null;
 		ctx.customSelected = null;
 
-		Array.from(document.querySelector(".side-2ur1Qk").children).forEach(element => {
+		Array.from(document.querySelector("."+ctx.classes.side).children).forEach(element => {
 			if (element.innerText == "What's New"){
 				nextSettingsPageEl = element
 			}
 		});
 
-		document.querySelectorAll(".item-3XjbnG").forEach(el=>el.addEventListener("click",defaultPageClicked));
+		document.querySelectorAll("."+ctx.classes.item).forEach(el=>el.addEventListener("click",defaultPageClicked));
 
 		seperator = document.createElement("DIV");
-		seperator.classList.add("separator-2wx7h6");
-		document.querySelector(".side-2ur1Qk").insertBefore(seperator, nextSettingsPageEl.previousSibling);
+		seperator.classList.add(ctx.classes.separator);
+		document.querySelector("."+ctx.classes.side).insertBefore(seperator, nextSettingsPageEl.previousSibling);
 		
 		header = document.createElement("DIV");
-		header.classList.add("header-2Kx1US");
-		header.classList.add("eyebrow-1Shfyi");
+		header.classList.add(ctx.classes.header);
+		header.classList.add(ctx.classes.eyebrow);
 		header.innerText = "ThisCord";
-		document.querySelector(".side-2ur1Qk").insertBefore(header, nextSettingsPageEl.previousSibling);
+		document.querySelector("."+ctx.classes.side).insertBefore(header, nextSettingsPageEl.previousSibling);
 
 		Object.keys(ctx.pages).forEach(key=>{
 			pageLink = document.createElement("DIV");
-			pageLink.classList.add("item-3XjbnG");
-			pageLink.classList.add("themed-2-lozF");
+			pageLink.classList.add(ctx.classes.item);
+			pageLink.classList.add(ctx.classes.themed);
 			pageLink.innerText = key;
 			pageLink.addEventListener("click",pageClicked);
-			document.querySelector(".side-2ur1Qk").insertBefore(pageLink, nextSettingsPageEl.previousSibling);
+			document.querySelector("."+ctx.classes.side).insertBefore(pageLink, nextSettingsPageEl.previousSibling);
 		});
 	}
 }

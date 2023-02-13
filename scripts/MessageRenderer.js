@@ -1,6 +1,18 @@
 var modules = using("/modules.js");
 var discordApi = using("/discordAPI.js");
 
+ctx.classes = {
+	spoilerText:modules.getCssName("spoilerText")[0].className,
+	hidden:modules.getCssName("hidden",["spoilerText"])[0].className,
+	wrapper:modules.getCssName("wrapper",["iconMentionThread"])[0].className,
+	roleMention:modules.getCssName("roleMention")[0].className,
+	desaturate:modules.getCssName("desaturate",["roleMention"])[0].className,
+	timestamp:modules.getCssName("timestamp",["slateBlockquoteContainer"])[0].className,
+}
+ctx.classes.justRoleMention=ctx.classes.roleMention.substring(
+	0,
+	ctx.classes.roleMention.length - ctx.classes.desaturate.length - 1
+)
 
 function Sanitise(content){
 	return content
@@ -146,7 +158,11 @@ function ParseContent(content,shouldSanitise=true){
 	content.match(/\|\|.*?\|\|/g)?.forEach(
 		m=>content = content.replace(
 			m,
-			`<span class=\"spoilerText-27bIiA hidden-3B-Rum\">${
+			`<span class=\"${
+				ctx.classes.spoilerText
+			} ${
+				ctx.classes.hidden
+			}\">${
 				m.substring(2,m.length-2)
 			}</span>`
 		)
@@ -164,7 +180,9 @@ function ParseContent(content,shouldSanitise=true){
 	content.match(/&lt;@!?[0-9]+&gt;/g)?.forEach(
 		m=>content = content.replace(
 			m,
-			`<span class=\"mention wrapper-1ZcZW- mention\" ThisCordUnresolvedMention UserID=\"${
+			`<span class=\"mention ${
+				ctx.classes.wrapper
+			} mention\" ThisCordUnresolvedMention UserID=\"${
 				m.replaceAll("&lt;","").replaceAll("&gt;","").replaceAll("@","").replaceAll("!","")
 			}\"></span>`
 		)
@@ -172,7 +190,9 @@ function ParseContent(content,shouldSanitise=true){
 	content.match(/&lt;#[0-9]+&gt;/g)?.forEach(
 		m=>content = content.replace(
 			m,
-			`<span class=\"channelMention wrapper-1ZcZW- mention\" ThisCordUnresolvedChannelMention getChannels=\"${
+			`<span class=\"channelMention ${
+				ctx.classes.wrapper
+			} mention\" ThisCordUnresolvedChannelMention getChannels=\"${
 				m.replaceAll("&lt;","").replaceAll("&gt;","").replaceAll("#","")
 			}\"></span>`
 		)
@@ -180,7 +200,11 @@ function ParseContent(content,shouldSanitise=true){
 	content.match(/&lt;@&amp;[0-9]+&gt;/g)?.forEach(
 		m=>content = content.replace(
 			m,
-			`<span class=\"roleMention-11Aaqi wrapper-1ZcZW- mention\" ThisCordUnresolvedRoleMention RoleID=\"${
+			`<span class=\"${
+				ctx.classes.justRoleMention
+			} ${
+				ctx.classes.wrapper
+			} mention\" ThisCordUnresolvedRoleMention RoleID=\"${
 				m.replaceAll("&lt;","").replaceAll("&gt;","").replaceAll("@","").replaceAll("&amp;","")
 			}\"></span>`
 		)
@@ -188,7 +212,9 @@ function ParseContent(content,shouldSanitise=true){
 	content.match(/&lt;\/[^:]+:[0-9]+&gt;/g)?.forEach(
 		m=>content = content.replace(
 			m,
-			`<span class=\"commandMention wrapper-1ZcZW- mention\">${
+			`<span class=\"commandMention ${
+				ctx.classes.wrapper
+			} mention\">${
 				m.substring(0,m.indexOf(":")).replaceAll("&lt;","")
 			}</span>`
 		)
@@ -239,53 +265,83 @@ function ParseContent(content,shouldSanitise=true){
 		var replace = "";
 		switch (format){
 			case "t":{
-				replace = "<span class=\"timestamp-6-ptG3\">"+
-				("00" + time.getHours()).slice(-2)+
-				":"+("00" + time.getMinutes()).slice(-2)
-				"</span>";
+				replace = `<span class="${
+					ctx.classes.timestamp
+				}">${
+					("00" + time.getHours()).slice(-2)
+				}:${
+					("00" + time.getMinutes()).slice(-2)
+				}</span>`;
 			}break;
 			case "T":{
-				replace = "<span class=\"timestamp-6-ptG3\">"+
-				("00" + time.getHours()).slice(-2)+
-				":"+("00" + time.getMinutes()).slice(-2)+
-				":"+("00" + time.getSeconds()).slice(-2)
-				"</span>";
+				replace = `<span class="${
+					ctx.classes.timestamp
+				}">${
+					("00" + time.getHours()).slice(-2)
+				}:${
+					("00" + time.getMinutes()).slice(-2)
+				}:${
+					("00" + time.getSeconds()).slice(-2)
+				}</span>`;
 			}break;
 			case "d":{
-				replace = "<span class=\"timestamp-6-ptG3\">"+
-				("00" + time.getDate()).slice(-2)+
-				"/"+("00" + (time.getMonth()+1)).slice(-2)+
-				"/"+("0000" + (time.getFullYear()+1)).slice(-4)
-				"</span>";
+				replace = `<span class="${
+					ctx.classes.timestamp
+				}">${
+					("00" + time.getDate()).slice(-2)
+				}:${
+					("00" + (time.getMonth()+1)).slice(-2)
+				}:${
+					("0000" + (time.getFullYear()+1)).slice(-4)
+				}</span>`;
 			}break;
 			case "D":{
-				replace = "<span class=\"timestamp-6-ptG3\">"+
-				("00" + time.getDate()).slice(-2)+
-				" "+time.toLocaleString('default', { month: 'long' })+
-				" "+("0000" + (time.getFullYear()+1)).slice(-4)
-				"</span>";
+				replace = `<span class="${
+					ctx.classes.timestamp
+				}">${
+					("00" + time.getDate()).slice(-2)
+				} ${
+					time.toLocaleString('default', { month: 'long' })
+				} ${
+					("0000" + (time.getFullYear()+1)).slice(-4)
+				}</span>`;
 			}break;
 			case "f":{
-				replace = "<span class=\"timestamp-6-ptG3\">"+
-				("00" + time.getDate()).slice(-2)+
-				" "+time.toLocaleString('default', { month: 'long' })+
-				" "+("0000" + (time.getFullYear()+1)).slice(-4)+
-				" "+("00" + time.getHours()).slice(-2)+
-				":"+("00" + time.getMinutes()).slice(-2)
-				"</span>";
+				replace = `<span class="${
+					ctx.classes.timestamp
+				}">${
+					("00" + time.getDate()).slice(-2)
+				} ${
+					time.toLocaleString('default', { month: 'long' })
+				} ${
+					("0000" + (time.getFullYear()+1)).slice(-4)
+				} ${
+					("00" + time.getHours()).slice(-2)
+				}:${
+					("00" + time.getMinutes()).slice(-2)
+				}</span>`;
 			}break;
 			case "F":{
-				replace = "<span class=\"timestamp-6-ptG3\">"+
-				time.toLocaleDateString("default", { weekday: 'long' })+
-				", "+("00" + time.getDate()).slice(-2)+
-				" "+time.toLocaleString('default', { month: 'long' })+
-				" "+("0000" + (time.getFullYear()+1)).slice(-4)+
-				" "+("00" + time.getHours()).slice(-2)+
-				":"+("00" + time.getMinutes()).slice(-2)+
-				"</span>";
+				replace = `<span class="${
+					ctx.classes.timestamp
+				}">${
+					time.toLocaleDateString("default", { weekday: 'long' })
+				}, ${
+					("00" + time.getDate()).slice(-2)
+				} ${
+					time.toLocaleString('default', { month: 'long' })
+				} ${
+					("0000" + (time.getFullYear()+1)).slice(-4)
+				} ${
+					("00" + time.getHours()).slice(-2)
+				}:${
+					("00" + time.getMinutes()).slice(-2)
+				}</span>`;
 			}break;
 			case "R":{
-				replace = `<span class=\"timestamp-6-ptG3\" timestamp=\"${n}\" ThisCordRelativeTime></span>`;
+				replace = `<span class="${
+					ctx.classes.timestamp
+				}" timestamp="${n}" ThisCordRelativeTime></span>`;
 			}break;
 			default:{
 				replace=m;

@@ -1,6 +1,25 @@
+var modules = using("/modules.js");
+
+//setup============================================================================================
+
+ctx.classes = {
+	layer:modules.getCssName("layer",["animating"])[0].className,
+	baseLayer:modules.getCssName("baseLayer",["animating"])[0].className,
+	selected:modules.getCssName("selected",["cozyMessage"])[0].className,
+	menu:modules.getCssName("menu",["sparkles"])[0].className,
+	layerContainer:modules.getCssName("layerContainer")[0].className,
+	notAppAsidePanel:modules.getCssName("notAppAsidePanel")[0].className,
+	messageListItem:modules.getCssName("messageListItem")[0].className,
+	content:modules.getCssName("content",["downloadProgressCircle"])[0].className,
+	chatContent:modules.getCssName("chatContent")[0].className,
+	scrollerInner:modules.getCssName("scrollerInner",["navigationDescription"])[0].className,
+}
 
 //settingsHook=====================================================================================
-ctx.settingsHook = document.querySelector(".layer-86YKbF.baseLayer-W6S8cY");
+ctx.settingsHook = document.querySelector(
+	"."+ctx.classes.layer+
+	"."+ctx.classes.baseLayer
+);
 ctx.settingsOpen = ctx.settingsHook.classList.contains("stop-animations");
 ctx.settingsHooks = []
 new MutationObserver(function (mutationList, observer) {
@@ -35,26 +54,29 @@ const runMessageHook = el=>{
 	if (el.id != "message" && el.id != "message-actions"){
 		return;
 	}
-	if (document.querySelectorAll(".selected-2LX7Jy").length > 1){
+	if (document.querySelectorAll("."+ctx.classes.selected).length > 1){
 		console.warn("WARNING: multiple messages selected retrying in 0.25 seconds");
 		setTimeout(runMessageHook,250,el);
 		return;
 	}
-	if (document.querySelectorAll(".selected-2LX7Jy").length == 0){
+	if (document.querySelectorAll("."+ctx.classes.selected).length == 0){
 		console.error("ERROR: no selected messages hook not fired");
 		return;
 	}
-	ctx.messageMenuHook.forEach(f=>f(el,document.querySelector(".selected-2LX7Jy")));
+	ctx.messageMenuHook.forEach(f=>f(el,document.querySelector("."+ctx.classes.selected)));
 }
 
 ctx.messageMenuHook = [];
 var messageMenuMutationObserver = new MutationObserver(records=>records.forEach(
 	record => Array
 	.from(record.addedNodes)
-	.forEach(el=>el.querySelectorAll(".menu-1QACrS[role=menu]").forEach(runMessageHook))
+	.forEach(el=>el?.querySelectorAll?.("."+ctx.classes.menu+"[role=menu]")?.forEach?.(runMessageHook))
 ));
 Array
-.from(document.querySelectorAll(".appDevToolsWrapper-1QxdQf>div>.layerContainer-2v_Sit"))
+.from(document.querySelectorAll(
+	"."+ctx.classes.notAppAsidePanel+
+	">."+ctx.classes.layerContainer
+))
 .forEach(el=>messageMenuMutationObserver.observe(el, {childList: true, subtree: true}));
 
 function AddMessageMenuHook(f){
@@ -76,20 +98,23 @@ ctx.messageLoadedHooks = [];
 new MutationObserver(records=>records.forEach(
 	record => Array
 	.from(record.addedNodes)
-	.filter(el=>el.nodeName == "LI" && el.classList.contains("messageListItem-ZZ7v6g"))
+	.filter(el=>el.nodeName == "LI" && el.classList.contains(ctx.classes.messageListItem))
 	.forEach(el=>ctx.messageLoadedHooks.forEach(fn => fn(el)))
-)).observe(document.querySelector(".content-1SgpWY"), {childList: true, subtree: true});
+)).observe(document.querySelector("."+ctx.classes.content), {childList: true, subtree: true});
 
 new MutationObserver(records=>records.forEach(
 	record=>Array
 	.from(record.addedNodes)
-	.filter(el=>el.nodeName == "MAIN" && el.classList.contains("chatContent-3KubbW"))
+	.filter(el=>el.nodeName == "MAIN" && el.classList.contains(ctx.classes.chatContent))
 	.forEach(
 		el=>Array
-		.from(el.querySelectorAll("ol.scrollerInner-2PPAp2>li.messageListItem-ZZ7v6g"))
+		.from(el.querySelectorAll(
+			"ol."+ctx.classes.scrollerInner+
+			">li."+ctx.classes.messageListItem
+		))
 		.forEach(el=>ctx.messageLoadedHooks.forEach(fn => fn(el)))
 	)
-)).observe(document.querySelector(".content-1SgpWY"), {childList: true, subtree: true});
+)).observe(document.querySelector("."+ctx.classes.content), {childList: true, subtree: true});
 
 function AddMessageLoadedHook(f){
 	if (typeof f!="function"){
@@ -106,7 +131,7 @@ function ForEachLoadedMessage(f){
 	if (typeof f!="function"){
 		throw "Error f must be a function";
 	}
-	document.querySelectorAll("LI.messageListItem-ZZ7v6g").forEach((el)=>f(el));
+	document.querySelectorAll("LI."+ctx.classes.messageListItem).forEach((el)=>f(el));
 }
 function ForEveryMessage(f){
 	ForEachLoadedMessage(f);

@@ -112,7 +112,14 @@
 						)
 					}catch(e){
 						if (e instanceof SyntaxError){
-							console.error("Syntax Error at '"+file+"' creating empty module")
+							console.error(
+								"Syntax Error at '"+
+								file+
+								"' creating empty module. Below is the stack trace\n"+
+								e.stack+
+								"\n"+
+								e.message
+							);
 							var func = function(){}
 						}
 					}

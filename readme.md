@@ -13,4 +13,4 @@ not tested with other discord mods so it might not work with then
 this is because the api for fetching wasm is available to the script creator to use if they want by
 just using the `WebAssembly.instantiateStreaming` module but with `ThisCord.fetchScript` instead of
 `fetch` and then they can pass what exactly is needed to the wasm module however with the implimentation
-that it had it didnt have enough acssess to the ThisCord object making it hard to develop for
+that it had it didnt have enough access to the ThisCord object making it hard to develop for

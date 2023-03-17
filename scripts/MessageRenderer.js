@@ -4,7 +4,7 @@ var discordApi = using("/discordAPI.js");
 ctx.classes = {
 	spoilerText:modules.getCssName("spoilerText")[0].className,
 	hidden:modules.getCssName("hidden",["spoilerText"])[0].className,
-	wrapper:modules.getCssName("wrapper",["iconMentionThread"])[0].className,
+	wrapper:"wrapper-1ZcZW-",//this has no identifying features so lets just hope it dosent disipear
 	roleMention:modules.getCssName("roleMention")[0].className,
 	desaturate:modules.getCssName("desaturate",["roleMention"])[0].className,
 	timestamp:modules.getCssName("timestamp",["slateBlockquoteContainer"])[0].className,

@@ -12,7 +12,7 @@ template.innerHTML = `
 <a href="https://google.com">link</a>
 `;
 
-AddToSettings.addPage("Embeds for message Links",template);
+AddToSettings.addPage("Embeds for message Links",template.content.cloneNode(true));
 
 function addCSS() {
 	if (document.getElementById("ThisCordEmbedCSS") !== null) { return; }

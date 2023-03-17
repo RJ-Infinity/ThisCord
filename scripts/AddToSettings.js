@@ -37,7 +37,7 @@ function pageClicked(e){
 	wrapper.classList.add(ctx.classes.contentColumn);
 	wrapper.classList.add(ctx.classes.contentColumnDefault);
 	wrapper.toggleAttribute("ThisCordSettingsElement");
-	wrapper.appendChild(ctx.pages[e.target.innerText].content.cloneNode(true));
+	wrapper.appendChild(ctx.pages[e.target.innerText]);
 
 	var settingsContent = document.querySelector(
 		"."+ctx.classes.contentColumn+
@@ -107,11 +107,11 @@ function addToSettings(loops = 0){
 	}
 }
 
-function addPage(name,template){
-	if (template.constructor.name != "HTMLTemplateElement" || template.nodeName != "TEMPLATE"){
-		throw "Error: content must be a template"
+function addPage(name,element){
+	if (!(element instanceof Element)){
+		throw "Error: content must be a element"
 	}
-	ctx.pages[name] = template;
+	ctx.pages[name] = element;
 }
 function removePage(name){delete ctx.pages[name];}
 hooks.AddSettingsHook(addToSettings);

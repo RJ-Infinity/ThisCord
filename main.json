@@ -2,5 +2,6 @@
 	"/ShowLoaded.js",
 	"(DONT LOAD)/test/test.js",
 	"/displaySvg.js",
-	"/showCrossServerReplys.js"
+	"/showCrossServerReplys.js",
+	"nitroThemes.js"
 ]

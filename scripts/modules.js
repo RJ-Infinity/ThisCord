@@ -141,4 +141,4 @@ function getCssName(sel,identifyingClasses=[],count){
 	).map(m=>({className:m.exports[sel],otherClasses:m.exports}));
 }
 
-exports({getToken,ToCodePoint,getEmojiURL,testEmoji,audioMap,getCssName,getModule})
+exports({getToken,ToCodePoint,getEmojiURL,testEmoji,audioMap,getCssName,getTextMap,getModule})

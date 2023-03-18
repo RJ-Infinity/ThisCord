@@ -69,10 +69,10 @@ function pageClicked(e){
 }
 function defaultPageClicked(e){
 	if (//if the button dosent change the page dont remove the content
-	e.target.innerText == "What's New" ||
-	e.target.getAttribute("aria-label")=="Log Out"||
-		e.target.innerText == "Log Out" ||
-		e.target.parentElement.innerText == "Log Out"
+		e.target.innerText == modules.getTextMap().WHATS_NEW ||
+		e.target.getAttribute("aria-label")==modules.getTextMap().LOGOUT||
+		e.target.innerText == modules.getTextMap().LOGOUT ||
+		e.target.parentElement.innerText == modules.getTextMap().LOGOUT
 	){return;}
 	document.querySelectorAll(".ThisCordSettingsHidden").forEach(el=>el.classList.remove("ThisCordSettingsHidden"));
 	eitherPageClicked(e);
@@ -90,7 +90,7 @@ function addToSettings(loops = 0){
 		ctx.customSelected = null;
 
 		Array.from(document.querySelector("."+ctx.classes.side).children).forEach(element => {
-			if (element.innerText == "What's New"){
+			if (element.innerText == modules.getTextMap().WHATS_NEW){
 				nextSettingsPageEl = element
 			}
 		});

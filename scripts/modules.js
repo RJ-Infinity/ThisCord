@@ -72,6 +72,10 @@ ModuleIDs = {
 			"./chaos_ptt_stop.mp3"
 		].reduce((acc, cur) => acc && m.exports.keys().includes(cur),true)
 	],
+	TextMap: [
+		m=>m?.exports?.WHATS_NEW !== void 0 &&
+		m?.exports?.LOGOUT !== void 0
+	],
 }
 
 function getModule(moduleID){
@@ -116,6 +120,11 @@ function audioMap(){
 	return getModule(ModuleIDs.AudioMap).exports;
 }
 
+function getTextMap(){
+	CheckModules();
+	return getModule(ModuleIDs.TextMap).exports;
+}
+
 function getCssName(sel,identifyingClasses=[],count){
 	CheckModules();
 	return ThisCord.DiscordModules.filter(
@@ -133,4 +142,3 @@ function getCssName(sel,identifyingClasses=[],count){
 }
 
 exports({getToken,ToCodePoint,getEmojiURL,testEmoji,audioMap,getCssName,getModule})
-// https://github.com/doggybootsy/discord-hacksget

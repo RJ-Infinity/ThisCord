@@ -108,7 +108,7 @@ function addToSettings(loops = 0){
 }
 
 function addPage(name,element){
-	if (!(element instanceof Element)){
+	if (!(element instanceof Element || element instanceof DocumentFragment)){
 		throw "Error: content must be a element"
 	}
 	ctx.pages[name] = element;

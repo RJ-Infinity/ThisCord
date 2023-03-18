@@ -9,6 +9,7 @@ AddCss.injectCSS("Hidden");
 
 
 ctx.pages = {}
+ctx.pageElements = {}
 
 ctx.classes = {
 	selected:modules.getCssName("selected",["topPill"])[0].className,
@@ -23,21 +24,31 @@ ctx.classes = {
 }
 
 function eitherPageClicked(e){
-	document.querySelectorAll("[ThisCordSettingsElement]").forEach(el=>el.remove());
+	document.querySelectorAll("[ThisCordSettingsElement]").forEach(
+		el=>el.parentElement.removeChild(el)
+	);
 	if (ctx.customSelected != undefined && ctx.customSelected != e.target){
 		//if we arent clicking ourself and the custom selected exitst
 		ctx.customSelected.classList.remove(ctx.classes.selected)
 	}
 }
 
+function getPage(title){
+	if (Object.keys(ctx.pageElements).includes(title))
+	{ return ctx.pageElements[title]; }
+	var page = document.createElement("div");
+	page.classList.add(ctx.classes.contentColumn);
+	page.classList.add(ctx.classes.contentColumnDefault);
+	page.toggleAttribute("ThisCordSettingsElement");
+	page.appendChild(ctx.pages[title]);
+	ctx.pageElements[title] = page;
+	return page;
+}
+
 function pageClicked(e){
 	eitherPageClicked(e);
 
-	var wrapper = document.createElement("div");
-	wrapper.classList.add(ctx.classes.contentColumn);
-	wrapper.classList.add(ctx.classes.contentColumnDefault);
-	wrapper.toggleAttribute("ThisCordSettingsElement");
-	wrapper.appendChild(ctx.pages[e.target.innerText]);
+	var wrapper = getPage(e.target.innerText);
 
 	var settingsContent = document.querySelector(
 		"."+ctx.classes.contentColumn+

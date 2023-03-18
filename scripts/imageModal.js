@@ -1,7 +1,7 @@
 var AddCss = using("AddCss.js");
 var modules = using("/modules.js");
 
-AddCss.addCSS("ImageModal",`
+AddCss.addCSS("ImageModal","ImageModal",`
 	@keyframes expand {
 		0%{
 			scale: 0;
@@ -110,7 +110,7 @@ function ShowImageModal(url,href){
 		el.setAttribute("ThisCordOldSyle",el.getAttribute("style")?el.getAttribute("style"):"");
 		el.setAttribute("style","display:none;");
 	});
-	AddCss.injectCSS("ImageModal");
+	AddCss.injectCSS("ImageModal","ImageModal");
 	document.querySelector("div+."+ctx.classes.layerContainer).appendChild(modal);
 	document
 	.getElementById("ThisCordImg")

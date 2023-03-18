@@ -2,10 +2,10 @@ var hooks = using("/hooks.js");
 var AddCss = using("/AddCss.js");
 var modules = using("/modules.js");
 
-AddCss.addCSS("Hidden",`.ThisCordSettingsHidden{
+AddCss.addCSS("AddToSettings","Hidden",`.ThisCordSettingsHidden{
 	display:none!important;
 }`);
-AddCss.injectCSS("Hidden");
+AddCss.injectCSS("AddToSettings","Hidden");
 
 
 ctx.pages = {}

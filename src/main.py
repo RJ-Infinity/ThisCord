@@ -10,6 +10,7 @@ from time import sleep
 from threading import Thread
 import base64
 import websocket
+import asyncio
 
 USER_PATH = os.path.expanduser("~")
 PATH = f"{USER_PATH}\\AppData\\Local\\Discord"

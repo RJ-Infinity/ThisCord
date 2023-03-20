@@ -8,7 +8,7 @@ template.innerHTML = `
 <a href="https://google.com">link</a>
 `;
 
-AddToSettings.addPage("testing",template);
+AddToSettings.addPage("testing",template.content.cloneNode(true));
 
 //testing the message hook
 

@@ -107,7 +107,11 @@ function ToCodePoint(emojiChar,seperator){
 }
 function getEmojiURL(emojiCodePoint){
 	CheckModules(true);//seems to load later
-	return getModule(ModuleIDs.EmojiMap).exports("./"+emojiCodePoint+".svg")
+	var EmojiConverterModule = getModule(ModuleIDs.EmojiMap)
+	if (EmojiConverterModule == undefined){
+		throw "Error: module not yet loaded try again";
+	}//this is still dodgy
+	return EmojiConverterModule.exports("./"+emojiCodePoint+".svg")
 }
 
 function testEmoji(e){

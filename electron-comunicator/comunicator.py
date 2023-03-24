@@ -57,6 +57,7 @@ class ElectronComunicator:
 			"--remote-debugging-port="+str(self.port).zfill(5),
 			*args
 		],shell=True,creationflags=0x00000008|0x00000200)
+		return self.electron_process
 	def is_already_open(self)->ElectronComunicator.OpenStates:
 		found = False
 		for proc in psutil.process_iter():

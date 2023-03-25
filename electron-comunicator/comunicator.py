@@ -59,16 +59,19 @@ class ElectronComunicator:
 		],shell=True,creationflags=0x00000008|0x00000200)
 		return self.electron_process
 	def is_already_open(self)->ElectronComunicator.OpenStates:
-		found = False
+		self.electron_process = None
 		for proc in psutil.process_iter():
 			if self.name in proc.name():
-				found = True
-				cmdArgs = proc.cmdline()
-				for arg in cmdArgs:
-					if arg.startswith("--remote-debugging-port") and arg.endswith(str(self.port)):
-						self.electron_process = proc
-						return ElectronComunicator.OpenStates.DebugOpen
-		return ElectronComunicator.OpenStates.DefaultOpen if found else ElectronComunicator.OpenStates.NotOpen
+				parentP = proc.parent()
+				while (parentP != None and parentP.name() == proc.name()):
+					cmdArgs = proc.cmdline()
+					for arg in cmdArgs:
+						if arg.startswith("--remote-debugging-port") and arg.endswith(str(self.port)):
+							return ElectronComunicator.OpenStates.DebugOpen
+					self.electron_process = parentP
+					parentP = self.electron_process.parent()
+					return ElectronComunicator.OpenStates.DefaultOpen
+		return ElectronComunicator.OpenStates.NotOpen
 	def kill_app(self):
 		if (self.electron_process != None):
 			self.electron_process.kill()

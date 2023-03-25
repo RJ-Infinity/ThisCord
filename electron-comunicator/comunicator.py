@@ -66,11 +66,14 @@ class ElectronComunicator:
 				cmdArgs = proc.cmdline()
 				for arg in cmdArgs:
 					if arg.startswith("--remote-debugging-port") and arg.endswith(str(self.port)):
+						self.electron_process = proc
 						return ElectronComunicator.OpenStates.DebugOpen
 		return ElectronComunicator.OpenStates.DefaultOpen if found else ElectronComunicator.OpenStates.NotOpen
 	def kill_app(self):
 		if (self.electron_process != None):
 			self.electron_process.kill()
+		else:
+			raise AttributeError("no electron process to kill find one with `is_already_open` or `find_first_open_process` or create on with `launch`")
 	def find_first_open_debug_version(self):
 		for proc in psutil.process_iter():
 			if self.name in proc.name():
@@ -89,9 +92,7 @@ class ElectronComunicator:
 					mainP = parentP
 					parentP = mainP.parent()
 				self.electron_process = mainP
-				return
-				# print(mainP)
-				# print("MAIN")
+				return self.electron_process
 	def use_most_recent_version(self):
 		if (not self.use_versioning):
 			raise ValueError("To use Version make sure UseVrsioning is true")

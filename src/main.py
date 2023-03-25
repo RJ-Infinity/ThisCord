@@ -1,15 +1,11 @@
 from __future__ import annotations
 import os
 import sys
-import json
-import io
-from flask import Flask, send_file,request, send_from_directory, Response, current_app
-from flask_cors import CORS, cross_origin
-import requests
-from time import sleep
-from threading import Thread, Event
-import base64
-import websocket
+from threading import Thread
+
+# THE FIRST THING WE DO IS OPEN DISCORD
+# this is because it is slow doing everything else
+# so they can all wait whilst discord opens
 
 USER_PATH = os.path.expanduser("~")
 PATH = f"{USER_PATH}\\AppData\\Local\\Discord"
@@ -19,33 +15,57 @@ COMMUNICATOR_PATH = EXECUTING_PATH.replace("src","electron-comunicator")
 sys.path.insert(0, COMMUNICATOR_PATH)
 from comunicator import ElectronComunicator
 
-server = Flask(__name__)
-cors = CORS(server)
-server.config["CORS_HEADERS"] = "Content-Type"
-
-def handleDiscordClose(DiscordProcess, server):
+def handleDiscordClose(DiscordProcess):
 	DiscordProcess.wait()
-	with server.app_context():
-		try:
-			requests.post("http://127.0.0.1:2829/quit")
-		except:
-			pass
-	return
+	os._exit(0) # Instead of asking all threads to also kill themselves, we just do it ourselves. Much easier and after all, we are the boss
 
 def launchDiscord(args):
 	port = 8473
 	EComunic = ElectronComunicator("Discord",None,PATH,port,True)
 	EComunic.use_most_recent_version()
-	EComunic.find_first_open_process()
 	open = EComunic.is_already_open()
 	print(open)
 	if open == ElectronComunicator.OpenStates.DefaultOpen:
 		EComunic.kill_app() #if it is open but not in debug mode close it
 	if open != ElectronComunicator.OpenStates.DebugOpen:
 		DiscordProcess = EComunic.launch(args) # if it isnt in debug mode it is closed as it should have been closed previously
-		CloseThread = Thread(target=handleDiscordClose, args=(DiscordProcess,server)) # create and start new thread to handle discord closing also closing script
+		CloseThread = Thread(target=handleDiscordClose, args=(DiscordProcess,)) # create and start new thread to handle discord closing also closing script
 		CloseThread.start()
 	return EComunic
+
+def parseArgs(args:list[str]):
+	flags = []
+	discordArgs = []
+	for arg in args:
+		if arg != "--" and len(discordArgs) == 0:
+			flags.append(arg)
+		else:
+			discordArgs.append(arg)
+	print(discordArgs)
+	return flags,discordArgs[1:]
+
+if __name__ == "__main__":
+	flags, args = parseArgs(sys.argv)
+	if "--no-launch" not in flags:
+		discordDebugger = launchDiscord(args)
+
+# THIS IS THE REST OF THE FILE
+# this file is essentialy split into two files
+# so that there is no additional overhead loading discord
+import json
+import io
+from flask import Flask, send_file,request, send_from_directory, Response, current_app
+from flask_cors import CORS, cross_origin
+import requests
+import base64
+import websocket
+import ctypes
+
+server = Flask(__name__)
+cors = CORS(server)
+server.config["CORS_HEADERS"] = "Content-Type"
+
+
 
 @server.route("/bootloader.js")
 @cross_origin()
@@ -106,10 +126,10 @@ def portalUrl(urlB64:str):
 	response = Response(resp.content, resp.status_code, headers)
 	return response
 
-@server.route("/quit", methods=["POST"])
-@cross_origin()
-def quitProcess():
-	os._exit(0) # Instead of asking all threads to also kill themselves, we just do it ourselves. Much easier and after all, we are the boss
+# @server.route("/quit", methods=["POST"])
+# @cross_origin()
+# def quitProcess():
+	
 class Return:
 	def __init__(self):
 		self.returned = False
@@ -119,8 +139,7 @@ class Return:
 		self.returned = True
 		self.returnValue = value
 
-def mainLaunch(r,args):
-	discordDebugger = launchDiscord(args)
+def inject(r):
 	try:
 		for w in discordDebugger.get_windows():
 			print(w)
@@ -132,17 +151,6 @@ def mainLaunch(r,args):
 		print("Error: The electron app failed the debug connection (posibly not in debug mode)",file=sys.stderr)
 		return r.Return(False)
 	return r.Return(True)
-
-def parseArgs(args:list[str]):
-	flags = []
-	discordArgs = []
-	for arg in args:
-		if arg != "--" and len(discordArgs) == 0:
-			flags.append(arg)
-		else:
-			discordArgs.append(arg)
-	print(discordArgs)
-	return flags,discordArgs[1:]
 
 class popupIO(io.StringIO):
 	def __init__(self, title:str, mirrorIo:io.StringIO=None):
@@ -159,7 +167,6 @@ class popupIO(io.StringIO):
 		return self.mirrorIo.read(*args,**kwargs)
 
 
-import ctypes
 if __name__ == "__main__":
 	os.chdir(os.path.dirname(__file__))
 	oldStdErr = sys.stderr
@@ -169,10 +176,9 @@ if __name__ == "__main__":
 		sys.stderr = logger
 		sys.stdout = logger
 	try:
-		flags, args = parseArgs(sys.argv)
 		if "--no-inject" not in flags:
 			ITR = Return()
-			injectThread = Thread(target = mainLaunch,args=(ITR,args,))
+			injectThread = Thread(target = inject,args=(ITR,))
 			injectThread.start()
 		if "--no-server" not in flags:
 			server.run(debug=False,port=2829)

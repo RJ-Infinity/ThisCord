@@ -71,15 +71,14 @@ server.add_middleware(
 	allow_methods=["*"],
 	allow_headers=["*"],
 )
-
-
+NoCache = {"Cache-Control": "no-cache"}
 
 @server.get("/bootloader.js")
-def code(request: Request):
-	return FileResponse("bootloader.js", media_type="text/plain")
+async def code(request: Request, response: Response):
+	return FileResponse("bootloader.js", headers=NoCache, media_type="text/plain")
 
 @server.get("/filesList")
-def files(request: Request):
+def files(request: Request, response: Response):
 	files_list = []
 	for path, _, files in os.walk(os.path.join("..","scripts")):
 		for file in files:
@@ -90,14 +89,14 @@ def files(request: Request):
 			mains = json.load(open(os.path.join("..","main.json"),"r"))
 		except json.decoder.JSONDecodeError:
 			mains = []
-	return JSONResponse(content={"files":files_list, "mains":mains})
+	return JSONResponse(content={"files":files_list, "mains":mains}, headers=NoCache)
 
 @server.get("/scripts/{filename}")
-async def scripts(request: Request, filename: str):
-	return FileResponse("..\\scripts\\" + filename)
+async def scripts(request: Request, response: Response, filename: str):
+	return FileResponse("..\\scripts\\" + filename, headers=NoCache)
 
 @server.route("/portal/{urlB64}", methods=['GET', 'POST', 'DELETE', 'PUT', 'PATCH'])
-def portalUrl(request: Request, urlB64:str):
+def portalUrl(request: Request, response: Response, urlB64:str):
 	# https://stackoverflow.com/a/36601467/15755351
 	resp = requests.request(
 		method=request.method,

@@ -12,6 +12,7 @@ PATH = f"{USER_PATH}\\AppData\\Local\\Discord"
 FILENAME = __file__
 EXECUTING_PATH = os.path.dirname(os.path.abspath(FILENAME))
 COMMUNICATOR_PATH = EXECUTING_PATH.replace("src","electron-comunicator")
+PORT = 8473
 sys.path.insert(0, COMMUNICATOR_PATH)
 from comunicator import ElectronComunicator
 
@@ -20,8 +21,7 @@ def handleDiscordClose(DiscordProcess):
 	os._exit(0) # Instead of asking all threads to also kill themselves, we just do it ourselves. Much easier and after all, we are the boss
 
 def launchDiscord(args):
-	port = 8473
-	EComunic = ElectronComunicator("Discord",None,PATH,port,True)
+	EComunic = ElectronComunicator("Discord",None,PATH,PORT,True)
 	EComunic.use_most_recent_version()
 	open = EComunic.is_already_open()
 	print(open)
@@ -129,6 +129,15 @@ def portalUrl(request: Request, response: Response, urlB64:str):
 
 def inject():
 	try:
+		discordDebugger
+	except NameError:
+		EComunic = ElectronComunicator("Discord",None,PATH,PORT,True)
+		EComunic.use_most_recent_version()
+		open = EComunic.is_already_open()
+		if open != ElectronComunicator.OpenStates.DebugOpen:
+			print("Error: discord debug mode not open try running without `--no-launch`")
+			return r.Return(False)
+	try:
 		for w in discordDebugger.get_windows():
 			print(w)
 			try:
@@ -167,9 +176,10 @@ if __name__ == "__main__":
 			injectThread = Thread(target = inject)
 			injectThread.start()
 		if "--no-server" not in flags:
-			uvicorn.run(server, host="0.0.0.0", port=2829)
+			uvicorn.run(server, port=2829)
 	except KeyboardInterrupt:
 		ctypes.windll.user32.MessageBoxW(0, "exiting keybard interupt", "DISCORD DEBUG", 1)
 		print("Exiting",file=sys.stderr)
 	sys.stderr = oldStdErr
 	sys.stdout = oldStdOut
+	os._exit(0) # make sure all thread exit

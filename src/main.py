@@ -15,6 +15,11 @@ COMMUNICATOR_PATH = EXECUTING_PATH.replace("src","electron-comunicator")
 sys.path.insert(0, COMMUNICATOR_PATH)
 from comunicator import ElectronComunicator
 
+def handleDiscordClose(DiscordProcess):
+	DiscordProcess.wait()
+	stdout, stderr = DiscordProcess.communicate() # Way better than .poll() with a loop and faster than .wait()
+	os._exit(0) # Instead of asking all threads to also kill themselves, we just do it ourselves. Much easier and after all, we are the boss
+
 def launchDiscord(args):
 	port = 8473
 	EComunic = ElectronComunicator("Discord",None,PATH,port,True)
@@ -25,7 +30,9 @@ def launchDiscord(args):
 		EComunic.kill_app() #if it is open but not in debug mode close it
 	if open != ElectronComunicator.OpenStates.DebugOpen:
 		DiscordProcess = EComunic.launch(args) # if it isnt in debug mode it is closed as it should have been closed previously
-	return EComunic, DiscordProcess
+		CloseThread = Thread(target=handleDiscordClose, args=(DiscordProcess,)) # create and start new thread to handle discord closing also closing script
+		CloseThread.start()
+	return EComunic
 
 def parseArgs(args:list[str]):
 	flags = []
@@ -41,7 +48,7 @@ def parseArgs(args:list[str]):
 if __name__ == "__main__":
 	flags, args = parseArgs(sys.argv)
 	if "--no-launch" not in flags:
-		discordDebugger, DiscordProcess = launchDiscord(args)
+		discordDebugger = launchDiscord(args)
 
 # THIS IS THE REST OF THE FILE
 # this file is essentialy split into two files
@@ -131,9 +138,7 @@ def inject():
 				print("Error: The injection failed standard discord opended")
 	except requests.exceptions.ConnectionError:
 		print("Error: The electron app failed the debug connection (posibly not in debug mode)",file=sys.stderr)
-		pass
-	DiscordProcess.communicate() # Way better than .poll() with a loop and faster than .wait()
-	os._exit(0)
+	return
 
 class popupIO(io.StringIO):
 	def __init__(self, title:str, mirrorIo:io.StringIO=None):

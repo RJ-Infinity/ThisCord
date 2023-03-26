@@ -54,27 +54,32 @@ if __name__ == "__main__":
 # so that there is no additional overhead loading discord
 import json
 import io
-from flask import Flask, send_file,request, send_from_directory, Response, current_app
-from flask_cors import CORS, cross_origin
+from fastapi import FastAPI, Request, Response
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 import requests
 import base64
 import websocket
 import ctypes
+import uvicorn
 
-server = Flask(__name__)
-cors = CORS(server)
-server.config["CORS_HEADERS"] = "Content-Type"
+server = FastAPI()
+server.add_middleware(
+	CORSMiddleware,
+	allow_origins=["http://localhost", "https://discord.com"],
+	allow_credentials=False,
+	allow_methods=["*"],
+	allow_headers=["*"],
+)
 
 
 
-@server.route("/bootloader.js")
-@cross_origin()
-def code():
-	return send_file("bootloader.js",mimetype="text/plain")
+@server.get("/bootloader.js")
+def code(request: Request):
+	return FileResponse("bootloader.js", media_type="text/plain")
 
-@server.route("/filesList")
-@cross_origin()
-def files():
+@server.get("/filesList")
+def files(request: Request):
 	files_list = []
 	for path, _, files in os.walk(os.path.join("..","scripts")):
 		for file in files:
@@ -85,17 +90,14 @@ def files():
 			mains = json.load(open(os.path.join("..","main.json"),"r"))
 		except json.decoder.JSONDecodeError:
 			mains = []
-	return json.dumps({"files":files_list, "mains":mains})
+	return JSONResponse(content={"files":files_list, "mains":mains})
 
+@server.get("/scripts/{filename}")
+async def scripts(request: Request, filename: str):
+	return FileResponse("..\\scripts\\" + filename)
 
-@server.route("/scripts/<path:filename>")
-@cross_origin()
-def scripts(filename):
-	return send_from_directory("..\\scripts\\",filename)
-
-
-@server.route("/portal/<urlB64>", methods=['GET', 'POST', 'DELETE', 'PUT', 'PATCH'])
-def portalUrl(urlB64:str):
+@server.route("/portal/{urlB64}", methods=['GET', 'POST', 'DELETE', 'PUT', 'PATCH'])
+def portalUrl(request: Request, urlB64:str):
 	# https://stackoverflow.com/a/36601467/15755351
 	resp = requests.request(
 		method=request.method,
@@ -123,12 +125,9 @@ def portalUrl(urlB64:str):
 		if name.lower() not in excluded_headers
 	]
 
-	response = Response(resp.content, resp.status_code, headers)
+	response = Response(resp.content, status_code=resp.status_code, headers=headers)
 	return response
 
-# @server.route("/quit", methods=["POST"])
-# @cross_origin()
-# def quitProcess():
 	
 class Return:
 	def __init__(self):
@@ -181,7 +180,7 @@ if __name__ == "__main__":
 			injectThread = Thread(target = inject,args=(ITR,))
 			injectThread.start()
 		if "--no-server" not in flags:
-			server.run(debug=False,port=2829)
+			uvicorn.run(server, host="0.0.0.0", port=2829)
 	except KeyboardInterrupt:
 		ctypes.windll.user32.MessageBoxW(0, "exiting keybard interupt", "DISCORD DEBUG", 1)
 		print("Exiting",file=sys.stderr)

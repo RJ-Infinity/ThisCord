@@ -19,7 +19,8 @@ from comunicator import ElectronComunicator
 def handleDiscordClose(DiscordProcess):
 	print("waiting")
 	DiscordProcess.communicate()
-	print("closed")
+	os.kill(DiscordProcess.pid, 0)
+	DiscordProcess.kill()
 	os._exit(0) # Instead of asking all threads to also kill themselves, we just do it ourselves. Much easier and after all, we are the boss
 
 def launchDiscord(args):
@@ -93,8 +94,9 @@ def files(request: Request, response: Response):
 			mains = []
 	return JSONResponse(content={"files":files_list, "mains":mains}, headers=NoCache)
 
-@server.get("/scripts/{filename}")
+@server.get("/scripts/{filename: path}")
 async def scripts(request: Request, response: Response, filename: str):
+	print(filename)
 	return FileResponse("..\\scripts\\" + filename, headers=NoCache)
 
 @server.route("/portal/{urlB64}", methods=['GET', 'POST', 'DELETE', 'PUT', 'PATCH'])
@@ -145,7 +147,7 @@ def inject():
 			try:
 				discordDebugger.run_code(w, """fetch('http://127.0.0.1:2829/bootloader.js').then((response) => response.text()).then(data => eval(data));""")
 			except websocket._exceptions.WebSocketBadStatusException:
-				print("Error: The injection failed standard discord opended")
+				print("Error: The injection failed  discord opended")
 	except requests.exceptions.ConnectionError:
 		print("Error: The electron app failed the debug connection (posibly not in debug mode)",file=sys.stderr)
 	return

@@ -138,7 +138,7 @@ def inject():
 		open = EComunic.is_already_open()
 		if open != ElectronComunicator.OpenStates.DebugOpen:
 			print("Error: discord debug mode not open try running without `--no-launch`")
-			return r.Return(False)
+			return
 	try:
 		for w in discordDebugger.get_windows():
 			print(w)

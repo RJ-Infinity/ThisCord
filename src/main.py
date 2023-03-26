@@ -127,7 +127,7 @@ def portalUrl(request: Request, response: Response, urlB64:str):
 	response = Response(resp.content, status_code=resp.status_code, headers=headers)
 	return response
 
-def inject(r):
+def inject():
 	try:
 		for w in discordDebugger.get_windows():
 			print(w)

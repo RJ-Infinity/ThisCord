@@ -16,8 +16,8 @@ sys.path.insert(0, COMMUNICATOR_PATH)
 from comunicator import ElectronComunicator
 
 def handleDiscordClose(DiscordProcess):
-	DiscordProcess.wait()
-	os._exit(0) # Instead of asking all threads to also kill themselves, we just do it ourselves. Much easier and after all, we are the boss
+	stdout, stderr = DiscordProcess.communicate() # Way better than .poll() with a loop and faster than .wait()
+	os._exit(0)
 
 def launchDiscord(args):
 	port = 8473
@@ -29,9 +29,9 @@ def launchDiscord(args):
 		EComunic.kill_app() #if it is open but not in debug mode close it
 	if open != ElectronComunicator.OpenStates.DebugOpen:
 		DiscordProcess = EComunic.launch(args) # if it isnt in debug mode it is closed as it should have been closed previously
-		CloseThread = Thread(target=handleDiscordClose, args=(DiscordProcess,)) # create and start new thread to handle discord closing also closing script
-		CloseThread.start()
-	return EComunic
+		# CloseThread = Thread(target=handleDiscordClose, args=(DiscordProcess,)) # create and start new thread to handle discord closing also closing script
+		# CloseThread.start()
+	return EComunic, DiscordProcess
 
 def parseArgs(args:list[str]):
 	flags = []
@@ -47,7 +47,7 @@ def parseArgs(args:list[str]):
 if __name__ == "__main__":
 	flags, args = parseArgs(sys.argv)
 	if "--no-launch" not in flags:
-		discordDebugger = launchDiscord(args)
+		discordDebugger, DiscordProcess = launchDiscord(args)
 
 # THIS IS THE REST OF THE FILE
 # this file is essentialy split into two files
@@ -127,16 +127,6 @@ def portalUrl(request: Request, response: Response, urlB64:str):
 	response = Response(resp.content, status_code=resp.status_code, headers=headers)
 	return response
 
-	
-class Return:
-	def __init__(self):
-		self.returned = False
-		self.returnValue = None
-	def Return(self,value=None):
-		print("returned "+str(value))
-		self.returned = True
-		self.returnValue = value
-
 def inject(r):
 	try:
 		for w in discordDebugger.get_windows():
@@ -147,8 +137,9 @@ def inject(r):
 				print("Error: The injection failed standard discord opended")
 	except requests.exceptions.ConnectionError:
 		print("Error: The electron app failed the debug connection (posibly not in debug mode)",file=sys.stderr)
-		return r.Return(False)
-	return r.Return(True)
+		pass
+		DiscordProcess.communicate() # Way better than .poll() with a loop and faster than .wait()
+		os._exit(0)
 
 class popupIO(io.StringIO):
 	def __init__(self, title:str, mirrorIo:io.StringIO=None):
@@ -175,8 +166,7 @@ if __name__ == "__main__":
 		sys.stdout = logger
 	try:
 		if "--no-inject" not in flags:
-			ITR = Return()
-			injectThread = Thread(target = inject,args=(ITR,))
+			injectThread = Thread(target = inject)
 			injectThread.start()
 		if "--no-server" not in flags:
 			uvicorn.run(server, host="0.0.0.0", port=2829)

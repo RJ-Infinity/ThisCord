@@ -16,7 +16,9 @@ sys.path.insert(0, COMMUNICATOR_PATH)
 from comunicator import ElectronComunicator
 
 def handleDiscordClose(DiscordProcess):
-	stdout, stderr = DiscordProcess.communicate() # Way better than .poll() with a loop and faster than .wait()
+	print("waiting")
+	DiscordProcess.communicate()
+	print("closed")
 	os._exit(0) # Instead of asking all threads to also kill themselves, we just do it ourselves. Much easier and after all, we are the boss
 
 def launchDiscord(args):

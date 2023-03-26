@@ -132,8 +132,8 @@ def inject():
 	except requests.exceptions.ConnectionError:
 		print("Error: The electron app failed the debug connection (posibly not in debug mode)",file=sys.stderr)
 		pass
-		DiscordProcess.communicate() # Way better than .poll() with a loop and faster than .wait()
-		os._exit(0)
+	DiscordProcess.communicate() # Way better than .poll() with a loop and faster than .wait()
+	os._exit(0)
 
 class popupIO(io.StringIO):
 	def __init__(self, title:str, mirrorIo:io.StringIO=None):

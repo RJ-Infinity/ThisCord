@@ -94,7 +94,7 @@ def files(request: Request, response: Response):
 			mains = []
 	return JSONResponse(content={"files":files_list, "mains":mains}, headers=NoCache)
 
-@server.get("/scripts/{filename: path}")
+@server.get("/scripts/{filename:path}")
 async def scripts(request: Request, response: Response, filename: str):
 	print(filename)
 	return FileResponse("..\\scripts\\" + filename, headers=NoCache)

@@ -15,10 +15,6 @@ COMMUNICATOR_PATH = EXECUTING_PATH.replace("src","electron-comunicator")
 sys.path.insert(0, COMMUNICATOR_PATH)
 from comunicator import ElectronComunicator
 
-def handleDiscordClose(DiscordProcess):
-	stdout, stderr = DiscordProcess.communicate() # Way better than .poll() with a loop and faster than .wait()
-	os._exit(0)
-
 def launchDiscord(args):
 	port = 8473
 	EComunic = ElectronComunicator("Discord",None,PATH,port,True)
@@ -29,8 +25,6 @@ def launchDiscord(args):
 		EComunic.kill_app() #if it is open but not in debug mode close it
 	if open != ElectronComunicator.OpenStates.DebugOpen:
 		DiscordProcess = EComunic.launch(args) # if it isnt in debug mode it is closed as it should have been closed previously
-		# CloseThread = Thread(target=handleDiscordClose, args=(DiscordProcess,)) # create and start new thread to handle discord closing also closing script
-		# CloseThread.start()
 	return EComunic, DiscordProcess
 
 def parseArgs(args:list[str]):

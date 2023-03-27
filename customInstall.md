@@ -9,4 +9,5 @@ The folder that you choose should have an "Update.exe" inside of it.
 If you dont know or cannot find your discord install location then follow these steps
 
 1. Press `windows` button and type "discord"
-[(/wp-smaller.png)](http://wordpress.com/ "Title")
+![image](https://cdn.upload.systems/uploads/06tPT5YD.png)
+

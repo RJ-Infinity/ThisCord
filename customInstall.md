@@ -12,4 +12,8 @@ If you dont know or cannot find your discord install location then follow these 
 ![image](https://cdn.upload.systems/uploads/06tPT5YD.png)
 2. Click "Open file location"
 ![image](https://cdn.upload.systems/uploads/dYjJd4n6.png)
+3. Right-click on the file and click "Open file location"
+![image](https://cdn.upload.systems/uploads/5ZGcI9d4.png)
+4. click the path bar and copy it, this is your custom location path
+![image](https://cdn.upload.systems/uploads/90t62fYP.png)
 

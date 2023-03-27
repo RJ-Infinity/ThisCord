@@ -8,10 +8,9 @@ The folder that you choose should have an "Update.exe" inside of it.
 # Dont know where location is
 If you dont know or cannot find your discord install location then follow these steps
 
-1. Press `windows` button and type "discord"
-![image](https://cdn.upload.systems/uploads/06tPT5YD.png)
-2. Click "Open file location"
-![image](https://cdn.upload.systems/uploads/dYjJd4n6.png)
+1. Press `windows` button and type "discord", then click "Open file location"
+![image](https://cdn.upload.systems/uploads/WSTsGJhP.png)
+
 3. Right-click on the file and click "Open file location"
   
 ![image](https://cdn.upload.systems/uploads/F4BNp9cw.png)

@@ -147,7 +147,7 @@ def inject():
 			try:
 				discordDebugger.run_code(w, """fetch('http://127.0.0.1:2829/bootloader.js').then((response) => response.text()).then(data => eval(data));""")
 			except websocket._exceptions.WebSocketBadStatusException:
-				print("Error: The injection failed  discord opended")
+				print("Error: The injection failed discord opended")
 	except requests.exceptions.ConnectionError:
 		print("Error: The electron app failed the debug connection (posibly not in debug mode)",file=sys.stderr)
 	return

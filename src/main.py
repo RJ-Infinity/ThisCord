@@ -12,10 +12,10 @@ USER_PATH = os.path.expanduser("~")
 PATH = f"{USER_PATH}\\AppData\\Local\\Discord"
 FILENAME = __file__
 EXECUTING_PATH = pathnav.path(os.path.abspath(FILENAME)).parent_dir
-COMMUNICATOR_PATH = EXECUTING_PATH.up().into("electron-comunicator").path
-SCRIPTS_PATH = EXECUTING_PATH.up().into("scripts").path
+COMMUNICATOR_PATH = EXECUTING_PATH.up().into("electron-comunicator")
+SCRIPTS_PATH = EXECUTING_PATH.up().into("scripts")
 PORT = 8473
-sys.path.insert(0, COMMUNICATOR_PATH)
+sys.path.insert(0, COMMUNICATOR_PATH.path)
 from comunicator import ElectronComunicator
 
 def handleDiscordClose(DiscordProcess):
@@ -98,7 +98,12 @@ def files(request: Request, response: Response):
 
 @server.get("/scripts/{filename:path}")
 async def scripts(request: Request, response: Response, filename: str):
-	return FileResponse("..\\scripts\\" + filename, headers=NoCache)
+	script_path = SCRIPTS_PATH.get_file(filename)
+	if script_path == None:
+		return Response(json.dumps({"error": "script not present"}), status_code = 404)
+	if not script_path.is_subdir(SCRIPTS_PATH):
+		return Response(json.dumps({"error": "cannot serve file that is not in the verified scripts folder"}), status_code = 401)
+	return FileResponse(script_path.path, headers=NoCache)
 
 @server.route("/portal/{urlB64}", methods=['GET', 'POST', 'DELETE', 'PUT', 'PATCH'])
 def portalUrl(request: Request, response: Response, urlB64:str):

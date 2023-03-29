@@ -2,6 +2,7 @@ from __future__ import annotations
 import os
 import sys
 from threading import Thread
+import pathnav
 
 # THE FIRST THING WE DO IS OPEN DISCORD
 # this is because it is slow doing everything else
@@ -10,8 +11,9 @@ from threading import Thread
 USER_PATH = os.path.expanduser("~")
 PATH = f"{USER_PATH}\\AppData\\Local\\Discord"
 FILENAME = __file__
-EXECUTING_PATH = os.path.dirname(os.path.abspath(FILENAME))
-COMMUNICATOR_PATH = EXECUTING_PATH.replace("src","electron-comunicator")
+EXECUTING_PATH = pathnav.path(os.path.abspath(FILENAME)).parent_dir
+COMMUNICATOR_PATH = EXECUTING_PATH.up().into("electron-comunicator").path
+SCRIPTS_PATH = EXECUTING_PATH.up().into("scripts").path
 PORT = 8473
 sys.path.insert(0, COMMUNICATOR_PATH)
 from comunicator import ElectronComunicator
@@ -96,7 +98,6 @@ def files(request: Request, response: Response):
 
 @server.get("/scripts/{filename:path}")
 async def scripts(request: Request, response: Response, filename: str):
-	print(filename)
 	return FileResponse("..\\scripts\\" + filename, headers=NoCache)
 
 @server.route("/portal/{urlB64}", methods=['GET', 'POST', 'DELETE', 'PUT', 'PATCH'])

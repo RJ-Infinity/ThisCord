@@ -89,26 +89,27 @@ function addToSettings(loops = 0){
 		ctx.previouslySelectedDoc = null;
 		ctx.customSelected = null;
 
+		var nextSettingsPageEl;
 		Array.from(document.querySelector("."+ctx.classes.side).children).forEach(element => {
 			if (element.innerText == modules.getTextMap().WHATS_NEW){
-				nextSettingsPageEl = element
+				nextSettingsPageEl = element;
 			}
 		});
 
 		document.querySelectorAll("."+ctx.classes.item).forEach(el=>el.addEventListener("click",defaultPageClicked));
 
-		seperator = document.createElement("DIV");
+		var seperator = document.createElement("DIV");
 		seperator.classList.add(ctx.classes.separator);
 		document.querySelector("."+ctx.classes.side).insertBefore(seperator, nextSettingsPageEl.previousSibling);
 		
-		header = document.createElement("DIV");
+		var header = document.createElement("DIV");
 		header.classList.add(ctx.classes.header);
 		header.classList.add(ctx.classes.eyebrow);
 		header.innerText = "ThisCord";
 		document.querySelector("."+ctx.classes.side).insertBefore(header, nextSettingsPageEl.previousSibling);
 
 		Object.keys(ctx.pages).forEach(key=>{
-			pageLink = document.createElement("DIV");
+			var pageLink = document.createElement("DIV");
 			pageLink.classList.add(ctx.classes.item);
 			pageLink.classList.add(ctx.classes.themed);
 			pageLink.innerText = key;

@@ -5,7 +5,6 @@ from subprocess import Popen
 import psutil
 from version import version
 from enum import Enum,auto
-from electron_inject import ElectronRemoteDebugger as ERB
 
 
 def remove_exe(procname:str)->str:
@@ -14,30 +13,27 @@ def remove_exe(procname:str)->str:
 class ElectronComunicator:
 	def __init__(
 		self,
-		name:str=None,
-		version:version=None,
-		location:str=None,
-		port:int=None,
-		use_versioning:bool=True
+		name:str,
+		location:str,
+		rendererport:int=None,
+		mainprocport:int=None,
+		use_versioning:bool=True,
+		version:version=None
 	):
 		self.name:str = name
 		self.version:version = version
 		self.location:str = location
-		self.port:int = port
+		self.rendererport:int = rendererport
+		self.mainprocport:int = mainprocport
 		self.use_versioning:bool = use_versioning
 
 		self.electron_process:psutil.Process=None
 
-
-	@property
-	def port(self):
-		return self.__port
-	@port.setter
-	def port(self,value):
-		self.__port=value
-		self.__ERB = ERB("localhost",self.port)
-
 	def launch(self,args = []):
+		if self.rendererport != None:
+			args.insert(0,"--remote-debugging-port="+str(self.rendererport).zfill(5))
+		if self.mainprocport != None:
+			args.insert(0,"--inspect="+str(self.mainprocport).zfill(5))
 		self.electron_process = Popen([
 			(
 				os.path.join(
@@ -48,13 +44,12 @@ class ElectronComunicator:
 					str(self.version.Build),
 					self.name
 				)
-			if self.use_versioning else
+				if self.use_versioning else
 				os.path.join(
 					self.location,
 					self.name
 				)
 			),
-			"--remote-debugging-port="+str(self.port).zfill(5),
 			*args
 		],shell=True,creationflags=0x00000008|0x00000200)
 		return self.electron_process
@@ -62,22 +57,30 @@ class ElectronComunicator:
 		self.electron_process = None
 		for proc in psutil.process_iter():
 			if self.name in proc.name():
-				parentP = proc.parent()
+				parentP = proc
 				while (parentP != None and parentP.name() == proc.name()):
-					cmdArgs = proc.cmdline()
-					for arg in cmdArgs:
-						if arg.startswith("--remote-debugging-port") and arg.endswith(str(self.port)):
-							return ElectronComunicator.OpenStates.DebugOpen
 					self.electron_process = parentP
 					parentP = self.electron_process.parent()
-					return ElectronComunicator.OpenStates.DefaultOpen
+				cmdArgs = self.electron_process.cmdline()
+				renderer = False
+				mainproc = False
+				for arg in cmdArgs:
+					renderer = renderer or (arg.startswith("--remote-debugging-port") and arg.endswith(str(self.rendererport)))
+					mainproc = mainproc or (arg.startswith("--inspect") and arg.endswith(str(self.mainprocport)))
+				if mainproc and renderer:
+					return ElectronComunicator.OpenStates.InspectDebugOpen
+				if mainproc:
+					return ElectronComunicator.OpenStates.InspectOnlyOpen
+				if renderer:
+					return ElectronComunicator.OpenStates.DebugOnlyOpen
+				return ElectronComunicator.OpenStates.DefaultOpen
 		return ElectronComunicator.OpenStates.NotOpen
 	def kill_app(self):
 		if (self.electron_process != None):
 			self.electron_process.kill()
 		else:
 			raise AttributeError("no electron process to kill find one with `is_already_open` or `find_first_open_process` or create on with `launch`")
-	def find_first_open_debug_version(self):
+	def find_first_open_renderer_version(self):
 		for proc in psutil.process_iter():
 			if self.name in proc.name():
 				cmdArgs = proc.cmdline()
@@ -105,12 +108,77 @@ class ElectronComunicator:
 			if (dir.startswith("app-") and version.Parse(dir[4:]) > largest_version):
 				largest_version = version.Parse(dir[4:])
 		self.version = largest_version
-	def get_windows(self):
-		return self.__ERB.windows()
-	def run_code(self,window,code):
-		return self.__ERB.eval(window,code)
+	def _init_windows(self, windows):
+		rv = []
+		for w in windows:
+			rv.append(self.Window(w))
+		return rv
+	def get_renderer_windows(self):
+		import requests # this is delayed as it is a slow operation
+		import time
+		return self._init_windows(requests.get(
+			f"http://localhost:{self.rendererport}/json/list?t={str(int(time.time()))}"
+		).json())
+	def get_mainproc_windows(self):
+		import requests # this is delayed as it is a slow operation
+		return self._init_windows(requests.get(
+			f"http://localhost:{self.mainprocport}/json/list"
+		).json())
+
+	class Window(object):
+		# https://github.com/tintinweb/electron-inject
+		def __init__(self, data):
+				self.url = data.get("webSocketDebuggerUrl")
+				if not self.url:
+					raise ValueError("no debugger url int the data")
+				self.data = data
+				self.ws = None
+
+		def _get_ws(self):
+			if not self.ws:
+				import websocket
+				self.ws = websocket.create_connection(self.url)
+			return self.ws
+
+		def run_code(self,code):
+			import json
+			ret = json.loads(self.sendrcv(json.dumps({
+				"id": 1,
+				"method": "Runtime.evaluate",
+				"params": {
+					"contextId": 1,
+					"doNotPauseOnExceptionsAndMuteConsole": False,
+					"expression": code,
+					"generatePreview": False,
+					"includeCommandLineAPI": True,
+					"objectGroup": "console",
+					"returnByValue": False,
+					"userGesture": True
+				}
+			})))
+			if "result" not in ret:
+				return ret
+			if ret["result"].get("wasThrown"):
+				raise Exception(ret["result"]["result"])
+			return ret["result"]
+
+		def send(self, *args, **kwargs):
+			return self._get_ws().send(*args, **kwargs)
+
+		def recv(self, *args, **kwargs):
+			return self.ws.recv(*args, **kwargs)
+
+		def sendrcv(self, msg):
+			self.send(msg)
+			return self.recv()
+
+		def close(self):
+			self.ws.close()
+
 
 	class OpenStates(Enum):
 		NotOpen=auto()
-		DebugOpen=auto()
+		DebugOnlyOpen=auto()
+		InspectOnlyOpen=auto()
+		InspectDebugOpen=auto()
 		DefaultOpen=auto()

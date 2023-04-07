@@ -105,7 +105,7 @@ function setTime(el){
 		return; // the element is no longer in the dom so stop setting the time
 	}
 	var diff = (new Date).getTime()/1000 - (el.getAttribute("timestamp"))
-	past = diff > 0;
+	var past = diff > 0;
 	diff = Math.abs(diff);
 	if (diff < 1){
 		el.innerText = "now";

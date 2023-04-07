@@ -4,7 +4,7 @@ function CheckModules(force=false){
 	}
 }
 
-ModuleIDs = {
+var ModuleIDs = {
 	Emoji: [
 		m=>m.id==742358,
 		m=>m?.exports?.Z?.className==="emoji",

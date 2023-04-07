@@ -14,7 +14,9 @@ FILENAME = __file__
 EXECUTING_PATH = pathnav.path(os.path.abspath(FILENAME)).parent_dir
 COMMUNICATOR_PATH = EXECUTING_PATH.up().into("electron-comunicator")
 SCRIPTS_PATH = EXECUTING_PATH.up().into("scripts")
-PORT = 8473
+RENDERERPORT = 8473
+MAINPROCPORT = 8474
+SERVERPORT = 2829
 sys.path.insert(0, COMMUNICATOR_PATH.path)
 from comunicator import ElectronComunicator
 
@@ -26,13 +28,13 @@ def handleDiscordClose(DiscordProcess):
 	os._exit(0) # Instead of asking all threads to also kill themselves, we just do it ourselves. Much easier and after all, we are the boss
 
 def launchDiscord(args):
-	EComunic = ElectronComunicator("Discord",None,PATH,PORT,True)
+	EComunic = ElectronComunicator("Discord",PATH,RENDERERPORT,MAINPROCPORT,True)
 	EComunic.use_most_recent_version()
 	open = EComunic.is_already_open()
 	print(open)
 	if open == ElectronComunicator.OpenStates.DefaultOpen:
 		EComunic.kill_app() #if it is open but not in debug mode close it
-	if open != ElectronComunicator.OpenStates.DebugOpen:
+	if open != ElectronComunicator.OpenStates.DebugOnlyOpen:
 		DiscordProcess = EComunic.launch(args) # if it isnt in debug mode it is closed as it should have been closed previously
 		CloseThread = Thread(target=handleDiscordClose, args=(DiscordProcess,)) # create and start new thread to handle discord closing also closing script
 		CloseThread.start()
@@ -137,26 +139,37 @@ def portalUrl(request: Request, response: Response, urlB64:str):
 	response = Response(resp.content, status_code=resp.status_code, headers=headers)
 	return response
 
-def inject():
+def inject(flags):
 	try:
 		discordDebugger
 	except NameError:
-		EComunic = ElectronComunicator("Discord",None,PATH,PORT,True)
-		EComunic.use_most_recent_version()
-		open = EComunic.is_already_open()
-		if open != ElectronComunicator.OpenStates.DebugOpen:
+		discordDebugger = ElectronComunicator("Discord",PATH,RENDERERPORT,MAINPROCPORT,True)
+		discordDebugger.use_most_recent_version()
+		open = discordDebugger.is_already_open()
+		if open == ElectronComunicator.OpenStates.DefaultOpen or open == ElectronComunicator.OpenStates.NotOpen:
 			print("Error: discord debug mode not open try running without `--no-launch`")
 			return
 	try:
-		for w in discordDebugger.get_windows():
-			print(w)
+		for w in (
+			[] if "--no-inject-renderer" in flags else
+			discordDebugger.get_renderer_windows()
+		):
+			print(w.data)
 			try:
-				discordDebugger.run_code(w, """fetch('http://127.0.0.1:2829/bootloader.js').then((response) => response.text()).then(data => eval(data));""")
+				w.run_code(f"""fetch("http://127.0.0.1:{SERVERPORT}/bootloader.js").then(response => response.text()).then(data => eval(data));""")
+			except websocket._exceptions.WebSocketBadStatusException:
+				print("Error: The injection failed discord opended")
+		for w in (
+			[] if "--no-inject-mainproc" in flags else
+			discordDebugger.get_mainproc_windows()
+		):
+			print(w.data)
+			try:
+				w.run_code(f"""(this.require = require)("http").get("http://127.0.0.1:{SERVERPORT}/bootloader.js",resp=>resp.on("data",d=>{{try{{eval(d.toString())}}catch(e){{console.error(e)}}}}))""")
 			except websocket._exceptions.WebSocketBadStatusException:
 				print("Error: The injection failed discord opended")
 	except requests.exceptions.ConnectionError:
 		print("Error: The electron app failed the debug connection (posibly not in debug mode)",file=sys.stderr)
-	return
 
 class popupIO(io.StringIO):
 	def __init__(self, title:str, mirrorIo:io.StringIO=None):
@@ -182,11 +195,11 @@ if __name__ == "__main__":
 		sys.stderr = logger
 		sys.stdout = logger
 	try:
-		if "--no-inject" not in flags:
-			injectThread = Thread(target = inject)
+		if "--no-inject-renderer" not in flags and "--no-inject-mainproc" not in flags:
+			injectThread = Thread(target = inject, args=(flags,))
 			injectThread.start()
 		if "--no-server" not in flags:
-			uvicorn.run(server, port=2829)
+			uvicorn.run(server, port=SERVERPORT)
 	except KeyboardInterrupt:
 		ctypes.windll.user32.MessageBoxW(0, "exiting keybard interupt", "DISCORD DEBUG", 1)
 		print("Exiting",file=sys.stderr)

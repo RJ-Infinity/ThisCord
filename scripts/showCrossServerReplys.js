@@ -4,7 +4,7 @@ var discordApi = using("/discordAPI.js");
 var messageRenderer = using("/MessageRenderer.js");
 var AddToSettings = using("/AddToSettings.js");
 
-template = document.createElement("template");
+var template = document.createElement("template");
 template.innerHTML = `
 <h1>Embeds for message Links</h1>
 

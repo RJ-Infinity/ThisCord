@@ -18,7 +18,7 @@
 			vProps.forEach(p=>{if (!aProps.includes(p)){throw p+" is a Virtual method and must be defined on the class that inherits off "+vClass.constructor.name;}});
 		}
 	}
-	class ThisCord extends VirtualClass{
+	class ThisCord extends VirtualClass {
 		constructor(){super([
 			"using",
 			"exports",
@@ -31,28 +31,22 @@
 		_modules={};
 		get modules(){return this._modules;}
 		set modules(val){this._modules=val;}
-		isComment=line=>line[0] == "/" && line[1] == "/";
-		trimComment=line=>line.substring(2).trimLeft();
 		getScriptInfo(script){
-			var lines = script.split("\n");
-			if (
-				!isComment(lines[0]) ||
-				trimComment(lines[0]) !== "==ThisCordScript=="
-			){return false;}
-			var i=1;
-			var rv = new Map;
-			while (trimComment(lines[i]) !== "@ThisCordScript=="){
-				if (!isComment(lines[i])){return false;}
-				var line = trimComment(lines[i]);
-				if (line[0] !== "@"){return false;}
-				var bareLine = line.substring(1).trimLeft();
-				var propName = bareLine.substring(0,(bareLine+" ").search(/\s/));
-				rv.set(propName,bareLine.substring(propName.length).trimLeft());
-				i++;
+			try{
+				var properties = script.split("/* @Thiscord-Script")[1].split("*/")[0].trim();
+				var lines = properties.split("\n");
+				var info = new Map();
+				lines.forEach(line => {
+					var property = line.split(/:(.*)/s);
+					info.set(property[0], JSON.parse(property[1].trim()));
+				});
+				return info
+			} catch {
+				return false
 			}
-			return rv;
 		}
 	}
+
 	if (typeof document !== "undefined"){(function(loops){//this is the renderer
 		if(document.querySelector(".container-1eFtFS")==null){
 			//TODO: ask the server to re-inject if it dosent load for long enough

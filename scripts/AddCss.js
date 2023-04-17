@@ -4,7 +4,7 @@ function addCSS(moduleName, cssName, cssString) {
 		ctx.CSSStrings[moduleName] = {};
 	}
 	if (ctx.CSSStrings[moduleName][cssName] !== undefined){
-		throw `Error: ${cssName} already exists if you want to edit it you have to delete and reinject it`;
+		throw `Error: ${moduleName}.${cssName} already exists if you want to edit it you have to delete and reinject it`;
 	}
 	ctx.CSSStrings[moduleName][cssName] = cssString;
 }

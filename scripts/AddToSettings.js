@@ -20,7 +20,7 @@ ctx.classes = {
 	side:modules.getCssName("side",["topPill"])[0].className,
 	separator:modules.getCssName("separator",["topPill"])[0].className,
 	header:modules.getCssName("header",["topPill"])[0].className,
-	eyebrow:modules.getCssName("eyebrow",[],55)[0].className,
+	eyebrow:modules.getCssName("eyebrow",[],56)[0].className,
 }
 
 function eitherPageClicked(e){

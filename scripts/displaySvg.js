@@ -4,7 +4,7 @@ var modules = using("/modules.js");
 
 ctx.classes = {
 	footer:modules.getCssName("footer",["newMosaicStyle"])[0].className,
-	textSmNormal:modules.getCssName("text-sm/normal",[],55)[0].className,
+	textSmNormal:modules.getCssName("text-sm/normal",[],56)[0].className,
 }
 
 var svgHandler = el=>Array

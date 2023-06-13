@@ -114,6 +114,7 @@
 								this.using.bind(this),
 								this.exports.bind(this),
 								this.exportAs.bind(this),
+								this.exportSingle.bind(this),
 								this.modules[filename].ctx
 							);
 						}catch (e){
@@ -135,12 +136,28 @@
 					if (this.modules[this.currentModule] == undefined){
 						throw "Error: should not ever be called EVER";
 					}
+					if (this.modules[this.currentModule].hasSingleExport){
+						throw "Error: cannot use `exports` or `exportAs` if `exportSingle` has been called in the same module";
+					}
 					if (typeof obj !== "object"){
-						throw "Error: the exports function takes a obj"
+						throw "Error: the exports function takes a obj";
 					}
 					this.modules[this.currentModule].exports = {...this.modules[this.currentModule].exports, ...obj};
 				}
 				exportAs(obj, name){return this.exports({[name]:obj});}
+				exportSingle(obj){
+					if (this.modules[this.currentModule] == undefined){
+						throw "Error: should not ever be called EVER";
+					}
+					if (this.modules[this.currentModule].hasSingleExport){
+						throw "Error: cannot use `exportSingle` twice in one module";
+					}
+					if (Object.keys(this.modules[this.currentModule].exports).length > 0){
+						throw "Error: cannot use `exportSingle` if `exports` or `exportAs` has been called in the same module";
+					}
+					this.modules[this.currentModule].hasSingleExport = true;
+					this.modules[this.currentModule].exports = obj;
+				}
 				parsePath(path){
 					var newPath = [];
 					var path = path.replaceAll("\\","/");
@@ -188,6 +205,7 @@
 								"using",
 								"exports",
 								"exportAs",
+								"exportSingle",
 								"ctx",
 								data+"\n//# sourceURL=http://127.0.0.1:2829/scripts"+file
 							)
@@ -207,6 +225,7 @@
 						this.modules[file] = {
 							type: "js",
 							exports: false,
+							hasSingleExport: false,
 							ctx: {},
 							function: func
 						};

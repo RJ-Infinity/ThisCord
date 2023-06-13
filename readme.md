@@ -4,7 +4,7 @@
 ### How to install ThisCord:
 > 1. go to https://github.com/TitusHM/ThisCord-Installer/releases, and download the latest installer release
 > 2. open the installer and press "Install Thiscord" button
-> 3. open discord and thiscord should automatically attach
+> 3. open discord and thiscord _**should**_ automatically attach
 ### NOTE
 not tested with other discord mods so it might not work with then
 

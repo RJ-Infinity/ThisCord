@@ -126,10 +126,7 @@
 						
 						this.currentModule = caller;
 					}
-					if (this.modules[filename].type == "json"){
-						return this.modules[filename].exports;
-					}//json can come in non object format
-					return {...this.modules[filename].exports};
+					return this.modules[filename].exports;
 				}
 				exports(obj){
 					if (this.modules[this.currentModule] == undefined){

@@ -1,10 +1,13 @@
-console.log("LOADED")
+console.log("LOADED");
 
 var modules = using("/modules.js");
-var wordmark = "."+modules.getCssName("wordmarkWindows")[0].className.replace(" ",".")
+const Graphics = using("Graphics.js");
+const msg = new Graphics.MessageBox("UPDATE", "A new upate of thiscord has been released.");
+msg.show();
+var wordmark = "." + modules.getCssName("wordmarkWindows")[0].className.replace(" ", ".");
 
-document.querySelector(wordmark).appendChild((()=>{
-	var a =  document.createElement("span");
+document.querySelector(wordmark).appendChild((() => {
+	var a = document.createElement("span");
 	a.innerText = "(ThisCord)";
 	// vertical-align: text-top;
 	a.style.verticalAlign = "text-top";
@@ -21,7 +24,7 @@ document.querySelector(wordmark).appendChild((()=>{
 	// margin-top: 0.2em;
 	a.style.marginTop = "0.2em";
 	return a;
-})())
+})());
 document.querySelector(wordmark).style.fontSize = "1em";
 
-exports({main:()=>{console.log("RunningMain")}})
+exports({ main: () => { console.log("RunningMain"); } });

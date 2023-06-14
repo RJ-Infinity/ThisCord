@@ -1,26 +1,28 @@
 var hooks = using("/hooks.js");
-var AddCss = using("/AddCss.js");
+var Css = using("/Css.js");
 var modules = using("/modules.js");
 
-AddCss.addCSS("AddToSettings","Hidden",`.ThisCordSettingsHidden{
+const CssModule = new Css();
+
+const hidden = CssModule.createCss("Hidden", `.ThisCordSettingsHidden{
 	display:none!important;
 }`);
-AddCss.injectCSS("AddToSettings","Hidden");
+hidden.inject();
 
 
-ctx.pages = {}
-ctx.pageElements = {}
+ctx.pages = {};
+ctx.pageElements = {};
 
 ctx.classes = {
-	selected:modules.getCssName("selected",["topPill"])[0].className,
+	selected:modules.getCssName("selected", ["topPill"])[0].className,
 	contentColumn:modules.getCssName("contentColumn")[0].className,
 	contentColumnDefault:modules.getCssName("contentColumnDefault")[0].className,
-	item:modules.getCssName("item",["topPill"])[0].className,
-	themed:modules.getCssName("themed",["topPill"])[0].className,
-	side:modules.getCssName("side",["topPill"])[0].className,
-	separator:modules.getCssName("separator",["topPill"])[0].className,
-	header:modules.getCssName("header",["topPill"])[0].className,
-	eyebrow:modules.getCssName("eyebrow",[],56)[0].className,
+	item:modules.getCssName("item", ["topPill"])[0].className,
+	themed:modules.getCssName("themed", ["topPill"])[0].className,
+	side:modules.getCssName("side", ["topPill"])[0].className,
+	separator:modules.getCssName("separator", ["topPill"])[0].className,
+	header:modules.getCssName("header", ["topPill"])[0].className,
+	eyebrow:modules.getCssName("eyebrow", [], 56)[0].className,
 }
 
 function eitherPageClicked(e){
@@ -70,15 +72,15 @@ function pageClicked(e){
 function defaultPageClicked(e){
 	if (//if the button dosent change the page dont remove the content
 		e.target.innerText == modules.getTextMap().WHATS_NEW ||
-		e.target.getAttribute("aria-label")==modules.getTextMap().LOGOUT||
+		e.target.getAttribute("aria-label") == modules.getTextMap().LOGOUT ||
 		e.target.innerText == modules.getTextMap().LOGOUT ||
 		e.target.parentElement.innerText == modules.getTextMap().LOGOUT
 	){return;}
 	document.querySelectorAll(".ThisCordSettingsHidden").forEach(el=>el.classList.remove("ThisCordSettingsHidden"));
 	eitherPageClicked(e);
 }
-function addToSettings(loops = 0){
-	if (hooks.SettingsOpen()){
+function addToSettings (loops = 0) {
+	if (hooks.SettingsOpen()) {
 		if(loops > 20){return;}//if it fails over 20 times give up
 		if(document.querySelector("."+ctx.classes.side)==null){
 			setTimeout(addToSettings, 250, loops+1);
@@ -91,17 +93,17 @@ function addToSettings(loops = 0){
 
 		var nextSettingsPageEl;
 		Array.from(document.querySelector("."+ctx.classes.side).children).forEach(element => {
-			if (element.innerText == modules.getTextMap().WHATS_NEW){
+			if (element.innerText == modules.getTextMap().WHATS_NEW) {
 				nextSettingsPageEl = element;
 			}
 		});
 
-		document.querySelectorAll("."+ctx.classes.item).forEach(el=>el.addEventListener("click",defaultPageClicked));
+		document.querySelectorAll("."+ctx.classes.item).forEach(el => el.addEventListener("click",defaultPageClicked));
 
 		var seperator = document.createElement("DIV");
 		seperator.classList.add(ctx.classes.separator);
 		document.querySelector("."+ctx.classes.side).insertBefore(seperator, nextSettingsPageEl.previousSibling);
-		
+
 		var header = document.createElement("DIV");
 		header.classList.add(ctx.classes.header);
 		header.classList.add(ctx.classes.eyebrow);
@@ -120,7 +122,7 @@ function addToSettings(loops = 0){
 }
 
 function addPage(name,element){
-	if (!(element instanceof Element || element instanceof DocumentFragment)){
+	if (!(element instanceof Element || element instanceof DocumentFragment)) {
 		throw "Error: content must be a element"
 	}
 	ctx.pages[name] = element;

@@ -17,13 +17,25 @@ ctx.classes = {
 	selected:modules.getCssName("selected", ["topPill"])[0].className,
 	contentColumn:modules.getCssName("contentColumn")[0].className,
 	contentColumnDefault:modules.getCssName("contentColumnDefault")[0].className,
-	item:modules.getCssName("item", ["topPill"])[0].className,
-	themed:modules.getCssName("themed", ["topPill"])[0].className,
-	side:modules.getCssName("side", ["topPill"])[0].className,
-	separator:modules.getCssName("separator", ["topPill"])[0].className,
-	header:modules.getCssName("header", ["topPill"])[0].className,
-	eyebrow:modules.getCssName("eyebrow", [], 56)[0].className,
+	item:modules.getCssName("item",["topPill"])[0].className,
+	themed:modules.getCssName("themed",["topPill"])[0].className,
+	side:modules.getCssName("side",["topPill"])[0].className,
+	separator:modules.getCssName("separator",["topPill"])[0].className,
+	header:modules.getCssName("header",["topPill"])[0].className,
+	eyebrow:modules.getCssName("eyebrow"),
 }
+//this is beacuse the one we want always has the least other classes but there are many that have the same name that we cant determine which one it is
+ctx.classes.eyebrow = ctx.classes.eyebrow.map(
+	classObj=>{
+		classObj.len = Object.keys(classObj.otherClasses).length;
+		return classObj;
+	}
+);
+ctx.classes.eyebrow = ctx.classes.eyebrow.reduce(
+	//this might not always work but it is better than the having to fix it every update
+	(smallestClass,classObj)=>smallestClass.len<classObj.len?smallestClass:classObj,
+	ctx.classes.eyebrow[0]
+).className;
 
 function eitherPageClicked(e){
 	document.querySelectorAll("[ThisCordSettingsElement]").forEach(

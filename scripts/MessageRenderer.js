@@ -2,8 +2,8 @@ var modules = using("/modules.js");
 var discordApi = using("/discordAPI.js");
 
 ctx.classes = {
-	spoilerText:modules.getCssName("spoilerText")[0].className,
-	hidden:modules.getCssName("hidden",["spoilerText"])[0].className,
+	spoilerText:modules.getCssName("spoilerContent")[0].className,
+	hidden:modules.getCssName("hidden",["spoilerContent"])[0].className,
 	wrapper:"wrapper-1ZcZW-",//this has no identifying features so lets just hope it dosent disipear
 	roleMention:modules.getCssName("roleMention")[0].className,
 	desaturate:modules.getCssName("desaturate",["roleMention"])[0].className,

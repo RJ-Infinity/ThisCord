@@ -1,9 +1,19 @@
 console.log("LOADED");
-
-var modules = using("/modules.js");
 const Graphics = using("Graphics.js");
-const msg = new Graphics.MessageBox("UPDATE", "A new upate of thiscord has been released.");
-msg.show();
+
+fetch("http://127.0.0.1:2829/version").then((response) => {
+	response.json().then((responseJson) => {
+		let currentVersion = responseJson["current"];
+		let latestVersion = responseJson["latest"];
+		let updateAvailable = latestVersion.version.localeCompare(currentVersion.version, undefined, { numeric: true, sensitivity: 'base' });
+		console.log(`latest: ${latestVersion}\ncurrent: ${currentVersion}\nResult: ${updateAvailable}`);
+		if (updateAvailable === 1) {
+			const msg = new Graphics.MessageBox("New version", `A new version of thiscord is available [${currentVersion.version} >> ${latestVersion.version}]. An update is available via the installer.`);
+			msg.show();
+		}
+	});
+});
+const modules = using("/modules.js");
 var wordmark = "." + modules.getCssName("wordmarkWindows")[0].className.replace(" ", ".");
 
 document.querySelector(wordmark).appendChild((() => {

@@ -74,7 +74,7 @@ ctx.modalTemplate.innerHTML =
 	</div>
 </div>`
 
-ctx.classes = {layerContainer:modules.getCssName("layerContainer")};
+ctx.classes = {layerContainer:modules.getCssName("layerContainer")[0].className};
 
 //TODO: add a handler for the context menu because it sends you to the wrong link
 

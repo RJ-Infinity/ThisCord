@@ -1,7 +1,7 @@
 var AddToSettings = using("/AddToSettings.js");
 var AddCss = using("/AddCss.js");
 
-console.log("nitroThemes LOADED!");
+console.log("ThisCord: nitroThemes LOADED!");
 
 AddCss.addCSS("NitroTheme", "apple-mint", ".custom-theme-background {--custom-theme-background: linear-gradient(180deg, var(--bg-gradient-mint-apple-1) 6.15%, var(--bg-gradient-mint-apple-2) 48.7%, var(--bg-gradient-mint-apple-3) 93.07%);}")
 AddCss.addCSS("NitroTheme", "citrus-sherbert", ".custom-theme-background {--custom-theme-background: linear-gradient(180deg, var(--bg-gradient-citrus-sherbert-1) 31.1%, var(--bg-gradient-citrus-sherbert-2) 67.09%);")

@@ -55,12 +55,12 @@ const runMessageHook = el=>{
 		return;
 	}
 	if (document.querySelectorAll("."+ctx.classes.selected).length > 1){
-		console.warn("WARNING: multiple messages selected retrying in 0.25 seconds");
+		console.warn("ThisCord: WARNING: multiple messages selected retrying in 0.25 seconds");
 		setTimeout(runMessageHook,250,el);
 		return;
 	}
 	if (document.querySelectorAll("."+ctx.classes.selected).length == 0){
-		console.error("ERROR: no selected messages hook not fired");
+		console.error("ThisCord: ERROR: no selected messages hook not fired");
 		return;
 	}
 	ctx.messageMenuHook.forEach(f=>f(el,document.querySelector("."+ctx.classes.selected)));

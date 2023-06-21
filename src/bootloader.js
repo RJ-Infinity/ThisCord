@@ -55,7 +55,7 @@
 			}else{
 				window.ThisCordTimeTillReInject=(1+((loops-20)*(loops-20)*0.01))*250
 			}
-			console.warn(`Discord not fully loaded.  Trying again in ${window.ThisCordTimeTillReInject/1000} seconds.`)
+			console.warn(`ThisCord: Discord not fully loaded.  Trying again in ${window.ThisCordTimeTillReInject/1000} seconds.`)
 			setTimeout(arguments.callee, window.ThisCordTimeTillReInject, loops+1);
 			//if it fails retry untill it works
 			return;
@@ -83,7 +83,7 @@
 							.filter(file=>{
 								var exists = files["files"].map(this.parsePath.bind(this)).includes(file);
 								if (!exists){
-									console.warn(`Skiping ${file} because it does not exist`);
+									console.warn(`ThisCord: Skiping ${file} because it does not exist`);
 								}
 								return exists;
 							})
@@ -119,7 +119,7 @@
 							);
 						}catch (e){
 							console.error(e)
-							console.warn(`loading '${filename}' failed skipping`)
+							console.warn(`ThisCord: loading '${filename}' failed skipping`)
 							this.modules[filename].exports = false;
 							this.currentModule = caller;
 							return {};
@@ -209,7 +209,7 @@
 						}catch(e){
 							if (e instanceof SyntaxError){
 								console.error(
-									"Syntax Error at '"+
+									"ThisCord: Syntax Error at '"+
 									file+
 									"' creating empty module. Below is the stack trace\n"+
 									e.stack+

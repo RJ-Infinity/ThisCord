@@ -65,7 +65,7 @@ function messageLink(el, paths) {
 	.getMessage(paths[1], paths[2])
 	.then(json => {
 		if (json == null) {
-			console.log(paths.join("/") + " not a valid message");
+			console.log("ThisCord: " + paths.join("/") + " not a valid message");
 			return;
 		}
 		// TODO: switch to the new AddCss module

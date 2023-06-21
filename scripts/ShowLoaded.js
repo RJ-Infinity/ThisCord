@@ -1,4 +1,4 @@
-console.log("LOADED")
+console.log("ThisCord: LOADED")
 
 var modules = using("/modules.js");
 var wordmark = "."+modules.getCssName("wordmarkWindows")[0].className.replace(" ",".")
@@ -24,4 +24,4 @@ document.querySelector(wordmark).appendChild((()=>{
 })())
 document.querySelector(wordmark).style.fontSize = "1em";
 
-exports({main:()=>{console.log("RunningMain")}})
+exports({main:()=>{console.log("ThisCord: RunningMain")}})

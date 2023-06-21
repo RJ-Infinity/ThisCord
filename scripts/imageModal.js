@@ -1,7 +1,9 @@
-var AddCss = using("AddCss.js");
+var Css = using("/Css.js");
 var modules = using("/modules.js");
 
-AddCss.addCSS("ImageModal","ImageModal",`
+const CssModule = new Css();
+
+const imageModal = CssModule.createCss("ImageModal", `
 	@keyframes expand {
 		0%{
 			scale: 0;

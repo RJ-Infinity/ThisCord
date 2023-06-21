@@ -1,4 +1,4 @@
-console.log("LOADED");
+console.log("ThisCord: LOADED")
 const Graphics = using("Graphics.js");
 
 fetch("http://127.0.0.1:2829/version").then((response) => {
@@ -37,4 +37,5 @@ document.querySelector(wordmark).appendChild((() => {
 })());
 document.querySelector(wordmark).style.fontSize = "1em";
 
-exports({ main: () => { console.log("RunningMain"); } });
+
+exports({main:()=>{console.log("ThisCord: RunningMain")}})

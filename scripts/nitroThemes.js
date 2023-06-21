@@ -3,7 +3,7 @@ var Css = using("/Css.js");
 
 const CssModule = new Css();
 
-console.log("nitroThemes LOADED!");
+console.log("ThisCord: nitroThemes LOADED!");
 
 const themeMap = {};
 themeMap["apple-mint"] = CssModule.createCss("apple-mint", ".custom-theme-background {--custom-theme-background: linear-gradient(180deg, var(--bg-gradient-mint-apple-1) 6.15%, var(--bg-gradient-mint-apple-2) 48.7%, var(--bg-gradient-mint-apple-3) 93.07%);}");

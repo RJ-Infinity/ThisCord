@@ -18,13 +18,70 @@
 			vProps.forEach(p=>{if (!aProps.includes(p)){throw p+" is a Virtual method and must be defined on the class that inherits off "+vClass.constructor.name;}});
 		}
 	}
+	function stripCommentsFromJson(script){
+		let inStr = false;
+		let inEsc = false;
+		let inSingleLineComment = false;
+		let inMultiLineComment = false;
+		let newScript = "";
+	
+		for (let i = 0; i < script.length; i++) {
+			if (
+				!inMultiLineComment &&
+				!inSingleLineComment &&
+				!inEsc &&
+				script.substring(i,i+1) == "\""
+			) { inStr = true; }
+			if (
+				!inMultiLineComment &&
+				!inSingleLineComment &&
+				!inEsc &&
+				inStr &&
+				script.substring(i,i+1) == "\\"
+			) { inEsc = true; }
+			if (
+				i+1 < script.length &&
+				!inStr &&
+				!inMultiLineComment &&
+				script.substring(i,i+1) == "/" &&
+				script.substring(i+1,i+2) == "/"
+			) { inSingleLineComment = true; }
+			if (
+				script.substring(i,i+1) == "\n"
+			) { inSingleLineComment = false; }
+			if (
+				i+1 < script.length &&
+				!inStr &&
+				!inSingleLineComment &&
+				script.substring(i,i+1) == "/" &&
+				script.substring(i+1,i+2) == "*"
+			) { inMultiLineComment = true; }
+			if (
+				!inSingleLineComment &&
+				!inMultiLineComment
+			) { newScript+=script.substring(i,i+1); }
+			if (
+				i>0 &&
+				!inStr &&
+				!inSingleLineComment &&
+				inMultiLineComment &&
+				script.substring(i,i+1) == "/" &&
+				script.substring(i-1,i) == "*"
+			) { inMultiLineComment = false; }
+		}
+		return newScript;
+	}
+	
+	
 	class ThisCord extends VirtualClass {
 		constructor(){
 			super([
 				"fetchThroughPortal",
 				"getFromServer",
 				"getJsonFromServer",
-				"fetchScript"
+				"fetchScript",
+				"createModuleFunction",
+				"context"
 			]);
 			this.getJsonFromServer("/filesList")
 			.then(
@@ -101,44 +158,30 @@
 		generateModule(file){
 			return this
 			.fetchScript(file)
-			.then(data => {
+			.then(this.getScriptInfo)
+			.then(({script,info}) => {
+				if (!info.has(this.context) || info.get(this.context) !== true) { return; }
 				if (file.substring(file.length - 3) == ".js"){
-					try{
-						var func = new Function(
-							"using",
-							"exports",
-							"exportAs",
-							data+"\n//# sourceURL=http://127.0.0.1:2829/scripts"+file
-						)
-					}catch(e){
-						if (e instanceof SyntaxError){
-							console.error(
-								"Syntax Error at '"+
-								file+
-								"' creating empty module. Below is the stack trace\n"+
-								e.stack+
-								"\n"+
-								e.message
-							);
-							var func = function(){}
-						}
-					}
+					var func = this.createModuleFunction(file, script, info)
+					
 					this.modules[file] = {
 						type: "js",
 						exports: false,
-						function: func
+						hasSingleExport: false,
+						function: func,
+						info: info,
 					};
 					return;
 				}
 				if (file.substring(file.length - 5) == ".json"){
 					this.modules[file] = {
 						type: "json",
-						exports:JSON.parse(data)
+						exports:JSON.parse(stripCommentsFromJson(script))
 					};
 					return;
 				}
-				console.warn(file+" not in known format. Skiping.");
-			});
+				console.warn(`ThisCord: ${file} not in known format. Skiping.`);
+			},(reason)=>console.warn(`ThisCord: ${file} being skipped due to the error in the UserScript comment: ${reason}`));
 		}
 		parsePath(path){
 			var newPath = [];
@@ -160,7 +203,7 @@
 			//TODO: stop things being rerun when they fail the first time
 			var filename = this.parsePath(file);
 			if (this.modules[filename] == undefined){
-				throw `Error: the file ${file} does not exist`;
+				throw `Error: the file ${file} does not exist or is not specified to run in this enviroment.`;
 			}
 			if (
 				this.modules[filename].type == "js" &&
@@ -242,7 +285,30 @@
 				getFromServer(path){return fetch("http://127.0.0.1:2829"+path).then(r=>r.text());}
 				getJsonFromServer(path){return fetch("http://127.0.0.1:2829"+path).then(r=>r.json());}
 				fetchScript(file) { return fetch("http://127.0.0.1:2829/scripts"+file).then(f=>f.text()); }
-				
+				createModuleFunction(file, script, info) {
+					try{
+						return new Function(
+							"using",
+							"exports",
+							"exportAs",
+							"exportSingle",
+							script+"\n//# sourceURL=http://127.0.0.1:2829/scripts"+file
+						);
+					}catch(e){
+						if (e instanceof SyntaxError){
+							console.error(
+								"Syntax Error at '"+
+								file+
+								"' creating empty module. Below is the stack trace\n"+
+								e.stack+
+								"\n"+
+								e.message
+							);
+							return function(){};
+						}
+					}
+				}
+				get context() { return "renderer"; }
 				/// this is the renderer only stuff
 				DiscordModules=[];
 				// this is some webpack magic that was modified from

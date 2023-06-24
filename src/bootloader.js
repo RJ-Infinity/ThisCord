@@ -99,7 +99,7 @@
 					.map(this.parsePath.bind(this))
 					.filter(file=>file.substring(file.length - 3) == ".js")
 					.filter(file=>{
-						var exists = this.modules[filename] !== undefined;
+						var exists = this.modules[file] !== undefined;
 						if (!exists) { console.warn(`Skiping ${file} because it does not exist or is not specified to run in this context`); }
 						return exists;
 					})

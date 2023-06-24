@@ -61,27 +61,43 @@
 		_modules={};
 		get modules(){return this._modules;}
 		set modules(val){this._modules=val;}
-		getScriptInfo(script){
-			var lines = properties.split("\n");
+		getScriptInfo(script){ return new Promise((resolve, reject) => {
+			let lines = script.split("\n");
 			if (lines[0].substring(0,2) !== "/*")
-			{return "file does not start with a comment";}
+			{return reject("file does not start with a comment");}
 
-			if (lines[0].substring(0,2).trimLeft().substring(0,16) !== "@Thiscord-Script")
-			{return "header does not start with the thiscord identifier";}
+			if (lines[0].substring(2).trimLeft().substring(0,16) !== "@Thiscord-Script")
+			{return reject("header does not start with the thiscord identifier");}
 			
-			if (script.substring(0,2).trimLeft().substring(0,16).trim() !== "")
-			{return "the first line must only contain the thiscord identifier";}
+			if (lines[0].substring(2).trimLeft().substring(16).trim() !== "")
+			{return reject("the first line must only contain the thiscord identifier");}
 
-			var info = new Map();
-			var i=1;
+			const isValidVersionStringList = version => version.reduce(
+				(acc,v)=>v.split("").reduce(
+					(acc,c)=>!['0','1','2','3','4','5','6','7','8','9'].includes(c) || acc,
+					false
+				) || acc,
+				false
+			);
+
+			let info = new Map();
+			let i=1;
 			while (!lines[i].includes("*/")){
-				var property = lines[i].split(/:(.*)/s);
-				try{info.set(property[0].trim(), JSON.parse(property[1].trim()));}
-				catch(e){if (e instanceof SyntaxError){console.warn("failed to parse the value of the property "+property[0].trim()+". skipping.");}else{throw e;}}
+				let property = lines[i].split(/:(.*)/s);
+				if (property[1].trim()[0]=="v"){
+					let version = property[1].trim().substring(1).split(".");
+					if (isValidVersionStringList(version)){console.warn("failed to parse the value of the property "+property[0].trim()+". skipping.");}
+					info.set(property[0].trim(), version.map(v=>parseInt(v)));
+				}else{
+					try{info.set(property[0].trim(), JSON.parse(property[1].trim()));}
+					catch(e){if (e instanceof SyntaxError){
+						console.warn("failed to parse the value of the property "+property[0].trim()+". skipping.");
+					}else{return reject(e);}}
+				}
 				i++;
 			}
-			return info
-		}
+			return resolve({script, info});
+		});}
 		generateModule(file){
 			return this
 			.fetchScript(file)

@@ -2,27 +2,27 @@ var imgModal = using("./imageModal.js")
 var hooks = using("/hooks.js");
 var modules = using("/modules.js");
 
-ctx.classes = {
+var classes = {
 	footer:modules.getCssName("footer",["newMosaicStyle"])[0].className,
 	textSmNormal:modules.getCssName("text-sm/normal"),
 }
 //this is beacuse the one we want always has the least other classes but there are many that have the same name that we cant determine which one it is
-ctx.classes.textSmNormal = ctx.classes.textSmNormal.map(
+classes.textSmNormal = classes.textSmNormal.map(
 	classObj=>{
 		classObj.len = Object.keys(classObj.otherClasses).length;
 		return classObj;
 	}
 );
-ctx.classes.textSmNormal = ctx.classes.textSmNormal.reduce(
+classes.textSmNormal = classes.textSmNormal.reduce(
 	//this might not always work but it is better than the having to fix it every update
 	(smallestClass,classObj)=>smallestClass.len<classObj.len?smallestClass:classObj,
-	ctx.classes.textSmNormal[0]
+	classes.textSmNormal[0]
 ).className;
 
 var svgHandler = el=>Array
 .from(el.querySelectorAll(
-	"."+ctx.classes.textSmNormal+
-	"."+ctx.classes.footer+
+	"."+classes.textSmNormal+
+	"."+classes.footer+
 	" > a"
 ))
 .filter(

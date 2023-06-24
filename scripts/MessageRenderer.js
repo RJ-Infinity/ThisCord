@@ -1,7 +1,7 @@
 var modules = using("/modules.js");
 var discordApi = using("/discordAPI.js");
 
-ctx.classes = {
+var classes = {
 	spoilerText:modules.getCssName("spoilerContent")[0].className,
 	hidden:modules.getCssName("hidden",["spoilerContent"])[0].className,
 	wrapper:"wrapper-1ZcZW-",//this has no identifying features so lets just hope it dosent disipear
@@ -9,9 +9,9 @@ ctx.classes = {
 	desaturate:modules.getCssName("desaturate",["roleMention"])[0].className,
 	timestamp:modules.getCssName("timestamp",["slateBlockquoteContainer"])[0].className,
 }
-ctx.classes.justRoleMention=ctx.classes.roleMention.substring(
+classes.justRoleMention=classes.roleMention.substring(
 	0,
-	ctx.classes.roleMention.length - ctx.classes.desaturate.length - 1
+	classes.roleMention.length - classes.desaturate.length - 1
 )
 
 function Sanitise(content){
@@ -159,9 +159,9 @@ function ParseContent(content,shouldSanitise=true){
 		m=>content = content.replace(
 			m,
 			`<span class=\"${
-				ctx.classes.spoilerText
+				classes.spoilerText
 			} ${
-				ctx.classes.hidden
+				classes.hidden
 			}\">${
 				m.substring(2,m.length-2)
 			}</span>`
@@ -181,7 +181,7 @@ function ParseContent(content,shouldSanitise=true){
 		m=>content = content.replace(
 			m,
 			`<span class=\"mention ${
-				ctx.classes.wrapper
+				classes.wrapper
 			} mention\" ThisCordUnresolvedMention UserID=\"${
 				m.replaceAll("&lt;","").replaceAll("&gt;","").replaceAll("@","").replaceAll("!","")
 			}\"></span>`
@@ -191,7 +191,7 @@ function ParseContent(content,shouldSanitise=true){
 		m=>content = content.replace(
 			m,
 			`<span class=\"channelMention ${
-				ctx.classes.wrapper
+				classes.wrapper
 			} mention\" ThisCordUnresolvedChannelMention getChannels=\"${
 				m.replaceAll("&lt;","").replaceAll("&gt;","").replaceAll("#","")
 			}\"></span>`
@@ -201,9 +201,9 @@ function ParseContent(content,shouldSanitise=true){
 		m=>content = content.replace(
 			m,
 			`<span class=\"${
-				ctx.classes.justRoleMention
+				classes.justRoleMention
 			} ${
-				ctx.classes.wrapper
+				classes.wrapper
 			} mention\" ThisCordUnresolvedRoleMention RoleID=\"${
 				m.replaceAll("&lt;","").replaceAll("&gt;","").replaceAll("@","").replaceAll("&amp;","")
 			}\"></span>`
@@ -213,7 +213,7 @@ function ParseContent(content,shouldSanitise=true){
 		m=>content = content.replace(
 			m,
 			`<span class=\"commandMention ${
-				ctx.classes.wrapper
+				classes.wrapper
 			} mention\">${
 				m.substring(0,m.indexOf(":")).replaceAll("&lt;","")
 			}</span>`
@@ -266,7 +266,7 @@ function ParseContent(content,shouldSanitise=true){
 		switch (format){
 			case "t":{
 				replace = `<span class="${
-					ctx.classes.timestamp
+					classes.timestamp
 				}">${
 					("00" + time.getHours()).slice(-2)
 				}:${
@@ -275,7 +275,7 @@ function ParseContent(content,shouldSanitise=true){
 			}break;
 			case "T":{
 				replace = `<span class="${
-					ctx.classes.timestamp
+					classes.timestamp
 				}">${
 					("00" + time.getHours()).slice(-2)
 				}:${
@@ -286,7 +286,7 @@ function ParseContent(content,shouldSanitise=true){
 			}break;
 			case "d":{
 				replace = `<span class="${
-					ctx.classes.timestamp
+					classes.timestamp
 				}">${
 					("00" + time.getDate()).slice(-2)
 				}:${
@@ -297,7 +297,7 @@ function ParseContent(content,shouldSanitise=true){
 			}break;
 			case "D":{
 				replace = `<span class="${
-					ctx.classes.timestamp
+					classes.timestamp
 				}">${
 					("00" + time.getDate()).slice(-2)
 				} ${
@@ -308,7 +308,7 @@ function ParseContent(content,shouldSanitise=true){
 			}break;
 			case "f":{
 				replace = `<span class="${
-					ctx.classes.timestamp
+					classes.timestamp
 				}">${
 					("00" + time.getDate()).slice(-2)
 				} ${
@@ -323,7 +323,7 @@ function ParseContent(content,shouldSanitise=true){
 			}break;
 			case "F":{
 				replace = `<span class="${
-					ctx.classes.timestamp
+					classes.timestamp
 				}">${
 					time.toLocaleDateString("default", { weekday: 'long' })
 				}, ${
@@ -340,7 +340,7 @@ function ParseContent(content,shouldSanitise=true){
 			}break;
 			case "R":{
 				replace = `<span class="${
-					ctx.classes.timestamp
+					classes.timestamp
 				}" timestamp="${n}" ThisCordRelativeTime></span>`;
 			}break;
 			default:{

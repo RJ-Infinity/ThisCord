@@ -108,7 +108,6 @@
 							"using",
 							"exports",
 							"exportAs",
-							"ctx",
 							data+"\n//# sourceURL=http://127.0.0.1:2829/scripts"+file
 						)
 					}catch(e){
@@ -127,7 +126,6 @@
 					this.modules[file] = {
 						type: "js",
 						exports: false,
-						ctx: {},
 						function: func
 					};
 					return;
@@ -179,7 +177,6 @@
 						this.exports.bind(this),
 						this.exportAs.bind(this),
 						this.exportSingle.bind(this),
-						this.modules[filename].ctx
 					);
 				}catch (e){
 					console.error(e)
@@ -229,7 +226,7 @@
 			}else{
 				window.ThisCordTimeTillReInject=(1+((loops-20)*(loops-20)*0.01))*250
 			}
-			console.warn(`Discord not fully loaded.  Trying again in ${window.ThisCordTimeTillReInject/1000} seconds.`)
+			console.warn(`ThisCord: Discord not fully loaded.  Trying again in ${window.ThisCordTimeTillReInject/1000} seconds.`)
 			setTimeout(arguments.callee, window.ThisCordTimeTillReInject, loops+1);
 			//if it fails retry untill it works
 			return;

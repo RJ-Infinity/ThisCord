@@ -14,6 +14,7 @@ FILENAME = __file__
 EXECUTING_PATH = pathnav.path(os.path.abspath(FILENAME)).parent_dir
 COMMUNICATOR_PATH = EXECUTING_PATH.up().into("electron-comunicator")
 SCRIPTS_PATH = EXECUTING_PATH.up().into("scripts")
+VERSION_URL = "https://raw.githubusercontent.com/RJ-Infinity/ThisCord/master/version.json"
 RENDERERPORT = 8473
 MAINPROCPORT = 8474
 SERVERPORT = 2829
@@ -138,6 +139,13 @@ def portalUrl(request: Request, response: Response, urlB64:str):
 
 	response = Response(resp.content, status_code=resp.status_code, headers=headers)
 	return response
+
+@server.get("/version")
+async def scripts(request: Request):
+	response = requests.get(VERSION_URL)
+	with open("../version.json", "r") as version:
+		currentVersion = json.load(version)
+		return JSONResponse(content={"latest": response.json(), "current": currentVersion}, headers=NoCache)
 
 def inject(flags):
 	try:

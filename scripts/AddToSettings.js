@@ -1,3 +1,11 @@
+/* @Thiscord-Script
+name: "Add To Settings"
+author: ["RJ_Infinity", "titushm"]
+version: "builtin"
+description: "Adds pages to the discord settings page"
+renderer: true
+*/
+
 var hooks = using("/hooks.js");
 var Css = using("/Css.js");
 var modules = using("/modules.js");

@@ -1,3 +1,11 @@
+/* @Thiscord-Script
+name: "Css"
+author: "titushm"
+version: "builtin"
+description: "adds Css stylesheets to the dom"
+renderer: true
+*/
+
 
 function generateUUID () {
 	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {

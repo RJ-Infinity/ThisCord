@@ -1,3 +1,10 @@
+/* @Thiscord-Script
+name: "Display Svg"
+author: "RJ_Infinity"
+version: "builtin"
+description: "shows preveiws of svg's when they are sent in a chat"
+renderer: true
+*/
 var imgModal = using("./imageModal.js")
 var hooks = using("/hooks.js");
 var modules = using("/modules.js");

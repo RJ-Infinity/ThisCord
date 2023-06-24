@@ -1,3 +1,11 @@
+/* @Thiscord-Script
+name: "Discord API"
+author: "RJ_Infinity"
+version: "builtin"
+description: "Allows Acsess to the Discord Api through requesting the URLs"
+renderer: true
+*/
+
 var modules = using("/modules.js");
 
 var MessageCache = {};

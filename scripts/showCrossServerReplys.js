@@ -1,3 +1,12 @@
+/* @Thiscord-Script
+name: "Show Cross Server Reply"
+author: "RJ_Infinity"
+version: "builtin"
+description: "Renders links to messages as the message they are linking to not just the channel name"
+renderer: true
+*/
+
+
 var hooks = using("/hooks.js");
 var modules = using("/modules.js");
 var discordApi = using("/discordAPI.js");

@@ -1,3 +1,12 @@
+/* @Thiscord-Script
+name: "Message Renderer"
+author: "RJ_Infinity"
+version: "builtin"
+description: "Renders a plaintext message in the style that discord does"
+renderer: true
+*/
+
+
 var modules = using("/modules.js");
 var discordApi = using("/discordAPI.js");
 

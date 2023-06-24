@@ -1,11 +1,13 @@
 var hooks = using("/hooks.js");
-var AddCss = using("/AddCss.js");
+var Css = using("/Css.js");
 var modules = using("/modules.js");
 
-AddCss.addCSS("AddToSettings","Hidden",`.ThisCordSettingsHidden{
+const CssModule = new Css();
+
+const hidden = CssModule.createCss("Hidden", `.ThisCordSettingsHidden{
 	display:none!important;
 }`);
-AddCss.injectCSS("AddToSettings","Hidden");
+hidden.inject();
 
 
 var pages = {}
@@ -83,15 +85,15 @@ function pageClicked(e){
 function defaultPageClicked(e){
 	if (//if the button dosent change the page dont remove the content
 		e.target.innerText == modules.getTextMap().WHATS_NEW ||
-		e.target.getAttribute("aria-label")==modules.getTextMap().LOGOUT||
+		e.target.getAttribute("aria-label") == modules.getTextMap().LOGOUT ||
 		e.target.innerText == modules.getTextMap().LOGOUT ||
 		e.target.parentElement.innerText == modules.getTextMap().LOGOUT
 	){return;}
 	document.querySelectorAll(".ThisCordSettingsHidden").forEach(el=>el.classList.remove("ThisCordSettingsHidden"));
 	eitherPageClicked(e);
 }
-function addToSettings(loops = 0){
-	if (hooks.SettingsOpen()){
+function addToSettings (loops = 0) {
+	if (hooks.SettingsOpen()) {
 		if(loops > 20){return;}//if it fails over 20 times give up
 		if(document.querySelector("."+classes.side)==null){
 			setTimeout(addToSettings, 250, loops+1);
@@ -133,7 +135,7 @@ function addToSettings(loops = 0){
 }
 
 function addPage(name,element){
-	if (!(element instanceof Element || element instanceof DocumentFragment)){
+	if (!(element instanceof Element || element instanceof DocumentFragment)) {
 		throw "Error: content must be a element"
 	}
 	pages[name] = element;

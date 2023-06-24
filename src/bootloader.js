@@ -219,49 +219,6 @@
 			this.modules[this.currentModule].hasSingleExport = true;
 			this.modules[this.currentModule].exports = obj;
 		}
-		generateModule(file) { return this
-		.fetchScript(file)
-		.then(data => {
-			if (file.substring(file.length - 3) == ".js"){
-				try{
-					var func = new Function(
-						"using",
-						"exports",
-						"exportAs",
-						"exportSingle",
-						"ctx",
-						data+"\n//# sourceURL=http://127.0.0.1:2829/scripts"+file
-					)
-				}catch(e){
-					if (e instanceof SyntaxError){
-						console.error(
-							"Syntax Error at '"+
-							file+
-							"' creating empty module. Below is the stack trace\n"+
-							e.stack+
-							"\n"+
-							e.message
-						);
-						var func = function(){}
-					}
-				}
-				this.modules[file] = {
-					type: "js",
-					exports: false,
-					hasSingleExport: false,
-					ctx: {},
-					function: func
-				};
-				return;
-			}
-			if (file.substring(file.length - 5) == ".json"){
-				this.modules[file] = {
-					type: "json",
-					exports:JSON.parse(data)
-				};
-				return;
-			}
-		}); }
 	}
 
 	if (typeof document !== "undefined"){(function(loops){//this is the renderer

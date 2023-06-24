@@ -32,8 +32,8 @@ AddCss.addCSS("ImageModal","ImageModal",`
 	}
 `);
 
-ctx.modalTemplate = document.createElement("template");
-ctx.modalTemplate.innerHTML = 
+var modalTemplate = document.createElement("template");
+modalTemplate.innerHTML = 
 `<div id="ThisCordBackground" class="${
 	modules.getCssName("backdrop",["withLayer"])[0].className
 } ${
@@ -74,12 +74,12 @@ ctx.modalTemplate.innerHTML =
 	</div>
 </div>`
 
-ctx.classes = {layerContainer:modules.getCssName("layerContainer")[0].className};
+var classes = {layerContainer:modules.getCssName("layerContainer")[0].className};
 
 //TODO: add a handler for the context menu because it sends you to the wrong link
 
 function ShowImageModal(url,href){
-	var modal = ctx.modalTemplate.content.cloneNode(true);
+	var modal = modalTemplate.content.cloneNode(true);
 	modal.getElementById("ThisCordImg").src = url;
 	modal.getElementById("ThisCordLink").href = href;
 	function cleanup(e){
@@ -105,13 +105,13 @@ function ShowImageModal(url,href){
 		}
 	});
 
-	Array.from(document.querySelector("div+."+ctx.classes.layerContainer).children)
+	Array.from(document.querySelector("div+."+classes.layerContainer).children)
 	.forEach(el=>{
 		el.setAttribute("ThisCordOldSyle",el.getAttribute("style")?el.getAttribute("style"):"");
 		el.setAttribute("style","display:none;");
 	});
 	AddCss.injectCSS("ImageModal","ImageModal");
-	document.querySelector("div+."+ctx.classes.layerContainer).appendChild(modal);
+	document.querySelector("div+."+classes.layerContainer).appendChild(modal);
 	document
 	.getElementById("ThisCordImg")
 	.parentElement

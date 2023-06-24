@@ -1,22 +1,22 @@
-ctx.CSSStrings = {}
+var CSSStrings = {}
 function addCSS(moduleName, cssName, cssString) {
-	if (ctx.CSSStrings[moduleName] === undefined){
-		ctx.CSSStrings[moduleName] = {};
+	if (CSSStrings[moduleName] === undefined){
+		CSSStrings[moduleName] = {};
 	}
-	if (ctx.CSSStrings[moduleName][cssName] !== undefined){
+	if (CSSStrings[moduleName][cssName] !== undefined){
 		throw `Error: ${moduleName}.${cssName} already exists if you want to edit it you have to delete and reinject it`;
 	}
-	ctx.CSSStrings[moduleName][cssName] = cssString;
+	CSSStrings[moduleName][cssName] = cssString;
 }
 function deleteCSS(moduleName, cssName) {
 	uninjectCSS(moduleName,cssName);
-	ctx.CSSStrings[moduleName][cssName] = undefined;
+	CSSStrings[moduleName][cssName] = undefined;
 }
 function injectCSS(moduleName,cssName) {
-	if (ctx.CSSStrings[moduleName] === undefined){
+	if (CSSStrings[moduleName] === undefined){
 		throw `Error: ${moduleName} is not defined`;
 	}
-	if (ctx.CSSStrings[moduleName][cssName] === undefined){
+	if (CSSStrings[moduleName][cssName] === undefined){
 		throw `Error: ${moduleName}.${cssName} is not defined`;
 	}
 	if (document.querySelector(
@@ -25,7 +25,7 @@ function injectCSS(moduleName,cssName) {
 	var MessageEmbedStyle = document.createElement("style");
 	MessageEmbedStyle.setAttribute("ThisCordCSSElementModule",moduleName);
 	MessageEmbedStyle.setAttribute("ThisCordCSSElementName",cssName);
-	MessageEmbedStyle.appendChild(document.createTextNode(ctx.CSSStrings[moduleName][cssName]));
+	MessageEmbedStyle.appendChild(document.createTextNode(CSSStrings[moduleName][cssName]));
 	document.head.appendChild(MessageEmbedStyle);
 }
 function uninjectCSS(moduleName, cssName) {

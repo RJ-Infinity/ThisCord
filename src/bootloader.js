@@ -115,7 +115,6 @@
 								this.exports.bind(this),
 								this.exportAs.bind(this),
 								this.exportSingle.bind(this),
-								this.modules[filename].ctx
 							);
 						}catch (e){
 							console.error(e)
@@ -203,7 +202,6 @@
 								"exports",
 								"exportAs",
 								"exportSingle",
-								"ctx",
 								data+"\n//# sourceURL=http://127.0.0.1:2829/scripts"+file
 							)
 						}catch(e){
@@ -223,7 +221,6 @@
 							type: "js",
 							exports: false,
 							hasSingleExport: false,
-							ctx: {},
 							function: func
 						};
 						return;

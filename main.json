@@ -1,6 +1,7 @@
 [
 	"/ShowLoaded.js",
 	"(DONT LOAD)/test/test.js",
+	"(DONT LOAD)/test/testBEND.js",
 	"/displaySvg.js",
 	"/showCrossServerReplys.js",
 	"nitroThemes.js"

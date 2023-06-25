@@ -84,6 +84,10 @@
 				"context"
 			]);
 			this.getJsonFromServer("/filesList")
+			.then(files=>{
+				this._files = files;
+				return files;
+			})
 			.then(
 				files=>Promise.all(
 					files["files"]
@@ -110,6 +114,7 @@
 				)
 			);
 		}
+		_files;
 		_currentModule = "/bootloader.js";
 		get currentModule(){return this._currentModule;}
 		set currentModule(val){this._currentModule = val;}
@@ -322,11 +327,37 @@
 					]
 				)};
 			}
-			window.ThisCord = new ThisCordRenderer;
+			globalThis.ThisCord = new ThisCordRenderer;
 		}
 	})(0)}
 	if (typeof require !== "undefined"){// this is the backend
-		console.log("THIS IS THISCORD IN THE BACKEND");
+		// for some reason some installs of discord start in different locations this means that we always know where we are
+		process.chdir(process.resourcesPath);
+
+		const request = require("./app.asar/node_modules/request");
+		const util = require('node:util');
+		const requestPromise = util.promisify(request);
+		class ThisCordBackend extends ThisCord{
+			constructor(){ super(); }
+			fetchThroughPortal(){}
+			getFromServer(path){return requestPromise("http://127.0.0.1:2829"+path).then(resp=>resp.body)}
+			getJsonFromServer(path){return requestPromise("http://127.0.0.1:2829"+path).then(resp=>{
+				try{
+					return JSON.parse(resp.body);
+				}catch(e){ if (e instanceof SyntaxError){
+					//TODO: proper error handling
+				}}
+			}); }
+			fetchScript(file) { return requestPromise("http://127.0.0.1:2829/scripts"+file).then(resp=>resp.body); }
+			createModuleFunction(file, script, info)
+			{ return () => { require(this._files.install_dir+"\\scripts\\"+file); } }
+			get context() { return "backend"; }
+		}
+		globalThis.ThisCord = new ThisCordBackend;
+		globalThis.using = globalThis.ThisCord.using.bind(globalThis.ThisCord);
+		globalThis.exports = globalThis.ThisCord.exports.bind(globalThis.ThisCord);
+		globalThis.exportAs = globalThis.ThisCord.exportAs.bind(globalThis.ThisCord);
+		globalThis.exportSingle = globalThis.ThisCord.exportSingle.bind(globalThis.ThisCord);
 	}
 })()
 //# sourceURL=http://127.0.0.1:2829/bootloader.js

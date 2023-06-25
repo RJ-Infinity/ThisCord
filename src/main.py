@@ -97,7 +97,12 @@ def files(request: Request, response: Response):
 			mains = json.load(open(os.path.join("..","main.json"),"r"))
 		except json.decoder.JSONDecodeError:
 			mains = []
-	return JSONResponse(content={"files":files_list, "mains":mains}, headers=NoCache)
+	return JSONResponse(content={
+		"files":files_list,
+		"install_dir":os.path.abspath(os.path.join(os.path.curdir,"..")),
+		"install_dir_unc":"file://"+os.path.abspath(os.path.join(os.path.curdir,"..")).replace("\\","/"),
+		"mains":mains
+	}, headers=NoCache)
 
 @server.get("/scripts/{filename:path}")
 async def scripts(request: Request, response: Response, filename: str):

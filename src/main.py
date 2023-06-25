@@ -198,6 +198,7 @@ if __name__ == "__main__":
 	os.chdir(os.path.dirname(__file__))
 	oldStdErr = sys.stderr
 	oldStdOut = sys.stdout
+	injectThread = None
 	if sys.executable.endswith("pythonw.exe"):
 		logger = open("logging.log","w")
 		sys.stderr = logger
@@ -213,4 +214,6 @@ if __name__ == "__main__":
 		print("Exiting",file=sys.stderr)
 	sys.stderr = oldStdErr
 	sys.stdout = oldStdOut
+	if injectThread != None:
+		injectThread.join()
 	os._exit(0) # make sure all thread exit

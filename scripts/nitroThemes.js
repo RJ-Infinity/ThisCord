@@ -4,6 +4,7 @@ author: ["titushm", "RJ_Infinity"]
 version: "builtin"
 description: "gives acsess to the styles that usualy require nitro"
 renderer: true
+entryPoint: "main"
 */
 
 
@@ -11,8 +12,6 @@ var AddToSettings = using("/AddToSettings.js");
 var Css = using("/Css.js");
 
 const CssModule = new Css();
-
-console.log("ThisCord: nitroThemes LOADED!");
 
 const themeMap = {};
 themeMap["apple-mint"] = CssModule.createCss("apple-mint", ".custom-theme-background {--custom-theme-background: linear-gradient(180deg, var(--bg-gradient-mint-apple-1) 6.15%, var(--bg-gradient-mint-apple-2) 48.7%, var(--bg-gradient-mint-apple-3) 93.07%);}");
@@ -110,15 +109,17 @@ function themeHandler (e) {
 
 AddToSettings.addPage("Nitro Themes", template);
 
-var themeObserver = new MutationObserver(mutations => {
-	mutations.forEach(mutation => {
-		if (mutation.type === "attributes" && mutation.target === document.documentElement) {
-			var classList = document.documentElement.classList;
-			if (!classList.contains("custom-theme-background")) {
-				classList.add("custom-theme-background");
+exportAs(()=>{
+	var themeObserver = new MutationObserver(mutations => {
+		mutations.forEach(mutation => {
+			if (mutation.type === "attributes" && mutation.target === document.documentElement) {
+				var classList = document.documentElement.classList;
+				if (!classList.contains("custom-theme-background")) {
+					classList.add("custom-theme-background");
+				}
 			}
-		}
+		});
 	});
-});
 
-themeObserver.observe(document.documentElement, { attributes: true, attributeOldValue: true });
+	themeObserver.observe(document.documentElement, { attributes: true, attributeOldValue: true });
+},"main");

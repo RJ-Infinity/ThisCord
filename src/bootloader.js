@@ -99,16 +99,11 @@
 					.map(file=>this.parsePath(file))
 					.map(this.generateModule.bind(this))
 				).then(
-					_=>files["mains"]
-					.map(this.parsePath.bind(this))
-					.filter(file=>file.substring(file.length - 3) == ".js")
-					.filter(file=>{
-						var exists = this.modules[file] !== undefined;
-						if (!exists) { console.warn(`Skiping ${file} because it does not exist or is not specified to run in this context`); }
-						return exists;
-					})
-					.map(file=>this.using(file))
-					.map(exported=>exported.main)
+					_=>Object.keys(this.modules)
+					.filter(path=>this.modules[path].info.has("entryPoint"))
+					.filter(path=>typeof this.modules[path].info.get("entryPoint")==="string")
+					.map(path=>({path,exports:this.using(path)}))
+					.map(module=>module.exports[this.modules[module.path].info.get("entryPoint")])
 					.filter(main=>typeof main === "function")
 					.forEach(main=>main())
 				)
@@ -179,7 +174,8 @@
 				if (file.substring(file.length - 5) == ".json"){
 					this.modules[file] = {
 						type: "json",
-						exports:JSON.parse(stripCommentsFromJson(script))
+						exports:JSON.parse(stripCommentsFromJson(script)),
+						info: info,
 					};
 					return;
 				}

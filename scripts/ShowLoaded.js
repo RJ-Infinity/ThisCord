@@ -4,6 +4,7 @@ author: "RJ_Infinity"
 version: "builtin"
 description: "Renders a ThisCord logo in the title bar and console logs when it loads"
 renderer: true
+entryPoint: "main"
 */
 
 

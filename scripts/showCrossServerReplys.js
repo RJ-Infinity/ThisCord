@@ -4,6 +4,7 @@ author: "RJ_Infinity"
 version: "builtin"
 description: "Renders links to messages as the message they are linking to not just the channel name"
 renderer: true
+entryPoint: "main"
 */
 
 
@@ -158,29 +159,32 @@ function serverLink(el, paths) {
 		el.appendChild(MessageEmbedTemplate.content.cloneNode(true));
 	});
 }
-var messageLinkHandler = el => Array
-// FIXME: can no longer rely on the message link being in an <a> as they now have a system to display that it is a
-//	discord message this means that we need to detect this retreive the message using discordAPI.getMessage and then
-//	detect the message link which can then be plugged into what is allready here however the message content needs to
-//	replace a different part of the message as the <a> is no longer there
-.from(el.querySelectorAll("a"))
-.filter(
-	el => (el.getAttribute("href") || "")
-	.match(/https:\/\/discord.com\/channels\/[^\s]*/g)
-)
-.forEach(
-	el => {
-		var paths = el.getAttribute("href").split("/").filter(
-			path => path.match(/(([0-9]+)|(@me))/g)
-		);
-		try {
-			([
-				"",
-				serverLink,
-				channelLink,
-				messageLink
-			])[paths.length](el, paths);
-		} catch (e) { }//TODO add error handling
-	}
-);
-hooks.ForEveryMessage(messageLinkHandler);
+
+exportAs(()=>{
+	var messageLinkHandler = el => Array
+	// FIXME: can no longer rely on the message link being in an <a> as they now have a system to display that it is a
+	//	discord message this means that we need to detect this retreive the message using discordAPI.getMessage and then
+	//	detect the message link which can then be plugged into what is allready here however the message content needs to
+	//	replace a different part of the message as the <a> is no longer there
+	.from(el.querySelectorAll("a"))
+	.filter(
+		el => (el.getAttribute("href") || "")
+		.match(/https:\/\/discord.com\/channels\/[^\s]*/g)
+	)
+	.forEach(
+		el => {
+			var paths = el.getAttribute("href").split("/").filter(
+				path => path.match(/(([0-9]+)|(@me))/g)
+			);
+			try {
+				([
+					"",
+					serverLink,
+					channelLink,
+					messageLink
+				])[paths.length](el, paths);
+			} catch (e) { }//TODO add error handling
+		}
+	);
+	hooks.ForEveryMessage(messageLinkHandler);
+},"main");

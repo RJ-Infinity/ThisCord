@@ -122,7 +122,7 @@ function ShowImageModal(url,href){
 		el.setAttribute("ThisCordOldSyle",el.getAttribute("style")?el.getAttribute("style"):"");
 		el.setAttribute("style","display:none;");
 	});
-	AddCss.injectCSS("ImageModal","ImageModal");
+	imageModal.inject()
 	document.querySelector("div+."+classes.layerContainer).appendChild(modal);
 	document
 	.getElementById("ThisCordImg")

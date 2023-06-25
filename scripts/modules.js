@@ -1,3 +1,11 @@
+/* @Thiscord-Script
+name: "Modules"
+author: "RJ_Infinity"
+version: "builtin"
+description: "Provides accsess to the internal modules discord uses"
+renderer: true
+*/
+
 function CheckModules(force=false){
 	if (force || ThisCord.DiscordModules.length < 1){
 		window.ThisCord.updateModules();

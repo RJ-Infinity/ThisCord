@@ -1,3 +1,11 @@
+/* @Thiscord-Script
+name: "test script"
+author: "RJ_Infinity"
+version: "builtin"
+description: "test"
+renderer: true
+*/
+
 var AddToSettings = using("/AddToSettings.js");
 
 var template = document.createElement("template");

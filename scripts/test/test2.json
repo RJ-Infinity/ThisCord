@@ -1,3 +1,11 @@
+/* @Thiscord-Script
+name: "jsonTest"
+author: "RJ_Infinity"
+version: "builtin"
+description: "test"
+renderer: true
+*/
+
 [{
 	"id": 1,
 	"first_name": "Jeanette",

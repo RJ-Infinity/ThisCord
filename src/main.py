@@ -97,7 +97,12 @@ def files(request: Request, response: Response):
 			mains = json.load(open(os.path.join("..","main.json"),"r"))
 		except json.decoder.JSONDecodeError:
 			mains = []
-	return JSONResponse(content={"files":files_list, "mains":mains}, headers=NoCache)
+	return JSONResponse(content={
+		"files":files_list,
+		"install_dir":os.path.abspath(os.path.join(os.path.curdir,"..")),
+		"install_dir_unc":"file://"+os.path.abspath(os.path.join(os.path.curdir,"..")).replace("\\","/"),
+		"mains":mains
+	}, headers=NoCache)
 
 @server.get("/scripts/{filename:path}")
 async def scripts(request: Request, response: Response, filename: str):
@@ -198,6 +203,7 @@ if __name__ == "__main__":
 	os.chdir(os.path.dirname(__file__))
 	oldStdErr = sys.stderr
 	oldStdOut = sys.stdout
+	injectThread = None
 	if sys.executable.endswith("pythonw.exe"):
 		logger = open("logging.log","w")
 		sys.stderr = logger
@@ -213,4 +219,6 @@ if __name__ == "__main__":
 		print("Exiting",file=sys.stderr)
 	sys.stderr = oldStdErr
 	sys.stdout = oldStdOut
+	if injectThread != None:
+		injectThread.join()
 	os._exit(0) # make sure all thread exit

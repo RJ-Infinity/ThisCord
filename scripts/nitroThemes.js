@@ -1,3 +1,12 @@
+/* @Thiscord-Script
+name: "Nitro Theme"
+author: ["titushm", "RJ_Infinity"]
+version: "builtin"
+description: "gives acsess to the styles that usualy require nitro"
+renderer: true
+*/
+
+
 var AddToSettings = using("/AddToSettings.js");
 var Css = using("/Css.js");
 

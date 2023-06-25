@@ -1,22 +1,11 @@
 /* @Thiscord-Script
-name: "test script"
-fileName: "blockSentry.js"
+name: "Block Science"
 author: "titushm"
-authorID: 123123123123123123
-version: "1.0.0"
-description: "this is very good script yes"
-updateURL: "https://update.me/script.js"
+version: "builtin"
+description: "blocks discords science url which is how they harvest data from you"
+renderer: true
 */
 
-// initiateScript.init({
-// name: "test script",
-// fileName: "blockSentry.js",
-// author: "titushm",
-// authorID: 123123123123123123,
-// version: "1.0.0",
-// description: "this is very good script yes",
-// updateURL: "https://update.me/script.js",
-// })
 console.log("blockScience LOADED!");
 const internalXMLHttpRequestOpen = window.XMLHttpRequest.prototype.send;
 const sentryRegex = /https:\/\/discord\.com\/api\/v\d+\/science/;

@@ -1,3 +1,10 @@
+/* @Thiscord-Script
+name: "Hooks"
+author: "RJ_Infinity"
+version: "builtin"
+description: "gives an api to hook into native discord events"
+renderer: true
+*/
 var modules = using("/modules.js");
 
 //setup============================================================================================

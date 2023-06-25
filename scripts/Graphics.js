@@ -1,3 +1,11 @@
+/* @Thiscord-Script
+name: "Graphics"
+author: "titushm"
+version: "builtin"
+description: "Contains classes to show graphical elements"
+renderer: true
+*/
+
 const Css = using("/Css.js");
 
 const CssModule = new Css();

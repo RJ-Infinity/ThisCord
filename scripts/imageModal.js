@@ -1,3 +1,13 @@
+/* @Thiscord-Script
+name: "Image modal"
+author: "RJ_Infinity"
+version: "builtin"
+description: "makes a native style image modal"
+renderer: true
+*/
+
+//TODO: merge ImageModal into the graphics library
+
 var Css = using("/Css.js");
 var modules = using("/modules.js");
 

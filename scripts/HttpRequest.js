@@ -1,3 +1,12 @@
+/* @Thiscord-Script
+name: "Http request"
+author: "RJ_Infinity"
+version: "builtin"
+description: "provides an api to modify http requests"
+renderer: true
+*/
+
+//TODO: finish the HttpRequst module
 var functions = [];
 
 XMLHttpRequest.prototype.ThisCordDefaultOpen = XMLHttpRequest.prototype.open;

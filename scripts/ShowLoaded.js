@@ -1,3 +1,12 @@
+/* @Thiscord-Script
+name: "Show Loaded"
+author: "RJ_Infinity"
+version: "builtin"
+description: "Renders a ThisCord logo in the title bar and console logs when it loads"
+renderer: true
+*/
+
+
 console.log("ThisCord: LOADED")
 const Graphics = using("Graphics.js");
 

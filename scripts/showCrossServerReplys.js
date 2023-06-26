@@ -27,7 +27,7 @@ AddToSettings.addPage("Embeds for message Links",template.content.cloneNode(true
 function addCSS() {
 	if (document.getElementById("ThisCordEmbedCSS") !== null) { return; }
 	var MessageEmbedTemplate = document.createElement("template");
-	// TODO: split the css into the correct file (i.e. some of this is related to the MessageRenderer.js)
+	// TODO(#29): split the css into the correct file (i.e. some of this is related to the MessageRenderer.js)
 	MessageEmbedTemplate.innerHTML = `
 	<style id="ThisCordEmbedCSS">
 		.ThisCord-embed{

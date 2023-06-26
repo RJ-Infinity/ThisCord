@@ -2,18 +2,18 @@
 name: "Block Science"
 author: "titushm"
 version: "builtin"
-description: "blocks discords science url which is how they harvest data from you"
+description: "blocks discords science url, used for telemetry data"
 renderer: true
+entryPoint: "main"
 */
 
 console.log("blockScience LOADED!");
-const internalXMLHttpRequestOpen = window.XMLHttpRequest.prototype.send;
-const sentryRegex = /https:\/\/discord\.com\/api\/v\d+\/science/;
+const Requests = using("Requests.js");
+const urlRegex = /https:\/\/discord\.com\/api\/v\d+\/science/;
 
-window.XMLHttpRequest.prototype.send = function (body) {
-	var url = this.__sentry_xhr_v2__.url;
-	if (url.match(sentryRegex)) {
-		return;
+
+Requests.onRequest((request) => {
+	if (request.url.match(urlRegex)) {
+		request.cancel = true;
 	};
-	return internalXMLHttpRequestOpen.apply(this, arguments);
-};
+});

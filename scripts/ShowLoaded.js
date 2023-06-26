@@ -4,10 +4,11 @@ author: "RJ_Infinity"
 version: "builtin"
 description: "Renders a ThisCord logo in the title bar and console logs when it loads"
 renderer: true
+entryPoint: "main"
 */
 
 
-console.log("ThisCord: LOADED")
+console.log("ThisCord: LOADED");
 const Graphics = using("Graphics.js");
 
 fetch("http://127.0.0.1:2829/version").then((response) => {
@@ -15,7 +16,7 @@ fetch("http://127.0.0.1:2829/version").then((response) => {
 		let currentVersion = responseJson["current"];
 		let latestVersion = responseJson["latest"];
 		let updateAvailable = latestVersion.version.localeCompare(currentVersion.version, undefined, { numeric: true, sensitivity: 'base' });
-		console.log(`latest: ${latestVersion}\ncurrent: ${currentVersion}\nResult: ${updateAvailable}`);
+		console.log(`latest: ${latestVersion.version}\ncurrent: ${currentVersion.version}\nResult: ${updateAvailable}`);
 		if (updateAvailable === 1) {
 			const msg = new Graphics.MessageBox("New version", `A new version of thiscord is available [${currentVersion.version} >> ${latestVersion.version}]. An update is available via the installer.`);
 			msg.show();
@@ -47,4 +48,4 @@ document.querySelector(wordmark).appendChild((() => {
 document.querySelector(wordmark).style.fontSize = "1em";
 
 
-exports({main:()=>{console.log("ThisCord: RunningMain")}})
+exports({ main: () => { console.log("ThisCord: RunningMain"); } });

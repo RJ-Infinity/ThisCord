@@ -6,7 +6,7 @@ description: "makes a native style image modal"
 renderer: true
 */
 
-//TODO: merge ImageModal into the graphics library
+//TODO(#27): merge ImageModal into the graphics library
 
 var Css = using("/Css.js");
 var modules = using("/modules.js");

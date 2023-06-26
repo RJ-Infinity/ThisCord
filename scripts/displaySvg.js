@@ -6,7 +6,7 @@ description: "shows preveiws of svg's when they are sent in a chat"
 renderer: true
 entryPoint: "main"
 */
-var imgModal = using("./imageModal.js")
+var Graphics = using("/Graphics.js")
 var hooks = using("/hooks.js");
 var modules = using("/modules.js");
 
@@ -57,7 +57,7 @@ exportAs(()=>{
 			img.style.maxWidth = "250px";
 			img.style.width = "100%";
 			img.style.cursor = "pointer";
-			img.addEventListener("click",_=>imgModal.ShowImageModal(url,el.getAttribute("href")))
+			img.addEventListener("click",_=>Graphics.ShowImageModal(url,el.getAttribute("href")))
 			el.parentElement.parentElement.parentElement.parentElement.appendChild(img);
 		})
 	);

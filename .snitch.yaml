@@ -1,0 +1,7 @@
+keywords:
+  - TODO
+  - FIXME
+title:
+  transforms:
+    - match: (.*)
+      replace: $1 (snitch auto report)

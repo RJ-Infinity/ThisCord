@@ -7,6 +7,8 @@ renderer: true
 */
 
 const Css = using("/Css.js");
+const modules = using("/modules.js");
+
 
 const CssModule = new Css();
 
@@ -213,3 +215,117 @@ class MessageBox {
 }
 
 exports({ MessageBox });
+
+const imageModal = CssModule.createCss("ImageModal", `
+	@keyframes expand {
+		0%{
+			scale: 0;
+		}
+		100%{
+			scale: 1;
+		}
+	}
+	@keyframes fade {
+		0%{
+			opacity: 0;
+		}
+		100%{
+			opacity: 1;
+		}
+	}
+	#ThisCordImageWrapper{
+		animation: expand .5s forwards;
+	}
+	#ThisCordImageWrapper.closing{
+		animation: expand .5s reverse;
+	}
+	#ThisCordImageWrapper{
+		animation: fade .5s forwards;
+	}
+	#ThisCordImageWrapper.closing{
+		animation: fade .5s reverse;
+	}
+`);
+
+var classes = {
+	backdrop: modules.getCssName("backdrop",["withLayer"])[0].className,
+	withLayer: modules.getCssName("withLayer")[0].className,
+	layer: modules.getCssName("layer",["backdrop"])[0].className,
+	focusLock: modules.getCssName("focusLock")[0].className,
+	modal: modules.getCssName("modal",["responsiveWidthMobile","image"])[0].className,
+	root: modules.getCssName("root",["spinnerContainer"])[0].className,
+	fullscreenOnMobile: modules.getCssName("fullscreenOnMobile",["spinnerContainer"])[0].className,
+	wrapper: modules.getCssName("wrapper",["mobileCloseWrapper"])[0].className,
+	imageWrapper: modules.getCssName("imageWrapper",["spoiler"])[0].className,
+	image: modules.getCssName("image",["responsiveWidthMobile","modal"]),
+	anchor: modules.getCssName("anchor")[0].className,
+	anchorUnderlineOnHover: modules.getCssName("anchorUnderlineOnHover")[0].className,
+	downloadLink: modules.getCssName("downloadLink")[0].className,
+
+
+}
+
+var modalTemplate = document.createElement("template");
+modalTemplate.innerHTML = 
+`<div id="ThisCordBackground" class="${classes.backdrop} ${classes.withLayer}" style="opacity: 0.85; background: hsl(0, calc(var(--saturation-factor, 1) * 0%), 0%);"></div>
+<div id="ThisCordImageWrapper" class="${classes.layer}">
+	<div class="${classes.focusLock}" role="dialog" aria-label="Image" tabindex="-1" aria-modal="true">
+		<div class="${classes.modal} ${classes.root} ${classes.fullscreenOnMobile}" style="opacity: 1; transform: scale(1);">
+			<div class="${classes.wrapper}">
+				<div class="${classes.imageWrapper} ${classes.image}" style="width: 593px; height: 593px;">
+					<img id="ThisCordImg" alt="Image" style="width: 593px; height: 593px;">
+				</div>
+				<a id="ThisCordLink" class="${classes.anchor} ${classes.anchorUnderlineOnHover} ${classes.downloadLink}" rel="noreferrer noopener" target="_blank" role="button" tabindex="0">Open in Browser</a>
+			</div>
+		</div>
+	</div>
+</div>`
+
+var classes = {layerContainer:modules.getCssName("layerContainer")[0].className};
+
+//TODO(#28): add a handler for the context menu because it sends you to the wrong link
+
+function ShowImageModal(url,href){
+	var modal = modalTemplate.content.cloneNode(true);
+	modal.getElementById("ThisCordImg").src = url;
+	modal.getElementById("ThisCordLink").href = href;
+	function cleanup(e){
+		e.target.removeEventListener("click",cleanup);
+
+		var PE = e.target.parentElement;
+		
+		
+		document.getElementById("ThisCordBackground")?.remove?.();
+		document.getElementById("ThisCordImageWrapper")?.remove?.();
+		document.getElementById("ThisCordStyle")?.remove?.();
+
+		Array.from(PE.children)
+		.forEach(el=>el.setAttribute("style",el.getAttribute("ThisCordOldSyle")));
+	}
+	modal.getElementById("ThisCordBackground").addEventListener("click",cleanup);
+	modal.getElementById("ThisCordImageWrapper").children[0]
+	.addEventListener("keydown",e=>{
+		if (e.key=="Escape"){
+			e.stopPropagation();
+			e.stopImmediatePropagation();
+			document.getElementById("ThisCordBackground").click();
+		}
+	});
+
+	Array.from(document.querySelector("div+."+classes.layerContainer).children)
+	.forEach(el=>{
+		el.setAttribute("ThisCordOldSyle",el.getAttribute("style")?el.getAttribute("style"):"");
+		el.setAttribute("style","display:none;");
+	});
+	imageModal.inject()
+	document.querySelector("div+."+classes.layerContainer).appendChild(modal);
+	document
+	.getElementById("ThisCordImg")
+	.parentElement
+	.parentElement
+	.parentElement
+	.parentElement
+	.focus();
+}
+
+exports({ShowImageModal});

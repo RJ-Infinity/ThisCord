@@ -162,7 +162,7 @@ function serverLink(el, paths) {
 
 exportAs(()=>{
 	var messageLinkHandler = el => Array
-	// FIXME: can no longer rely on the message link being in an <a> as they now have a system to display that it is a
+	// FIXME(#35): can no longer rely on the message link being in an <a> as they now have a system to display that it is a
 	//	discord message this means that we need to detect this retreive the message using discordAPI.getMessage and then
 	//	detect the message link which can then be plugged into what is allready here however the message content needs to
 	//	replace a different part of the message as the <a> is no longer there

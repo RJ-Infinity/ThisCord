@@ -262,7 +262,7 @@
 
 	if (typeof document !== "undefined"){(function(loops){//this is the renderer
 		if(document.querySelector(".container-1eFtFS")==null){
-			//TODO: ask the server to re-inject if it dosent load for long enough
+			//TODO(#32): ask the server to re-inject if it dosent load for long enough
 			if (loops<20){
 				window.ThisCordTimeTillReInject = 250
 			}else{

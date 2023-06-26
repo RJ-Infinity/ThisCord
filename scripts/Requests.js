@@ -43,7 +43,7 @@ if (ThisCord.context === "renderer") {
 			resourceType: details.resourceType,
 			timestamp: details.timestamp,
 		};
-		//TODO: Make properties like body actually have an effect when changed.
+		//TODO(#26): Make properties like body actually have an effect when changed.
 		Requests.callbacks.onRequest.forEach(callback => callback(params));
 		callback({ cancel: params.cancel, requestHeaders: params.headers });
 	});

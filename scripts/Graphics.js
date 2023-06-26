@@ -1,6 +1,6 @@
 /* @Thiscord-Script
 name: "Graphics"
-author: "titushm"
+author: ["titushm", "RJ_Infinity"]
 version: "builtin"
 description: "Contains classes to show graphical elements"
 renderer: true

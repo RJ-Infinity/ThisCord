@@ -78,7 +78,7 @@ function messageLink(el, paths) {
 			console.log("ThisCord: " + paths.join("/") + " not a valid message");
 			return;
 		}
-		// TODO: switch to the new AddCss module
+		// TODO(#30): switch to the new AddCss module
 		addCSS(); 
 		MessageEmbedTemplate = document.createElement("template");
 		MessageEmbedTemplate.innerHTML = `

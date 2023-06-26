@@ -88,7 +88,7 @@ modalTemplate.innerHTML =
 
 var classes = {layerContainer:modules.getCssName("layerContainer")[0].className};
 
-//TODO: add a handler for the context menu because it sends you to the wrong link
+//TODO(#28): add a handler for the context menu because it sends you to the wrong link
 
 function ShowImageModal(url,href){
 	var modal = modalTemplate.content.cloneNode(true);

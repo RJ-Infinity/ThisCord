@@ -42,7 +42,8 @@ function resolveMentions(el){
 }
 function resolveChannelMentions(el, serverID){
 	Array.from(el.querySelectorAll("[ThisCordUnresolvedChannelMention]")).forEach(
-		// TODO: change from the /server/channels to the /channel endpoint
+		// TODO(#24): change from the /server/channels to the /channel endpoint
+
 		// FIXME: dosent detect threads (posibly the channel endpoint fixes this)
 		el=>discordApi.getChannels(serverID).then(json=>{
 			var channel = json.find(r=>r.id == el.getAttribute("getChannels"))

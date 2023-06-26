@@ -341,7 +341,7 @@
 				try{
 					return JSON.parse(resp.body);
 				}catch(e){ if (e instanceof SyntaxError){
-					//TODO: proper error handling
+					//TODO(#33): proper error handling
 				}}
 			}); }
 			fetchScript(file) { return requestPromise("http://127.0.0.1:2829/scripts"+file).then(resp=>resp.body); }

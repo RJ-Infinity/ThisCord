@@ -14,7 +14,7 @@ if (ThisCord.context === "renderer") {
 			cancel: false,
 			url: this.__sentry_xhr_v2__.url,
 			method: this.__sentry_xhr_v2__.method,
-			body: JSON.parse(body),
+			body,
 			headers: this.__sentry_xhr_v2__.request_headers,
 			response: this.response,
 			responseText: this.responseText,
@@ -23,7 +23,7 @@ if (ThisCord.context === "renderer") {
 		};
 		Requests.callbacks.onRequest.forEach(callback => callback(params));
 		if (params.cancel) return;
-		ThisCord.XMLHttpRequestOpen.apply(this, [JSON.stringify(params.body)]);
+		return ThisCord.XMLHttpRequestOpen.apply(this, [params.body]);
 	};
 } else {
 	const { session } = require('electron');

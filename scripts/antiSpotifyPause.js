@@ -15,7 +15,7 @@ const urlRegex = /https:\/\/api\.spotify\.com\/v\d+\/me\/player\/pause/;
 Requests.onRequest((request) => {
 	if (request.url.match(urlRegex)) {
 		request.cancel = true;
-		let alertClass = modules.getCssName("base").filter(element => Object.keys(element.otherClasses).includes("container"))[0].className;
+		let alertClass = modules.getCssName("base", ["container"])[0].className;
 		let alertObserver = new MutationObserver((mutations) => {
 			mutations.forEach((mutation) => {
 				if (mutation.addedNodes.length > 0) {

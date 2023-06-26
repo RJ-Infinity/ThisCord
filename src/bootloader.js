@@ -199,7 +199,7 @@
 			return "/"+newPath.join("/");
 		}
 		using(file){
-			//TODO: stop things being rerun when they fail the first time
+			//TODO(#31): stop things being rerun when they fail the first time
 			var filename = this.parsePath(file);
 			if (this.modules[filename] == undefined){
 				throw `Error: the file ${file} does not exist or is not specified to run in this enviroment.`;

@@ -74,7 +74,7 @@ function resolveChannelMentions(el, serverID){
 				/*PUBLIC_THREAD*/symbolsContent.thread,
 				/*PRIVATE_THREAD*/symbolsContent.thread,
 				// the ones below i cannot test?
-				// TODO: test the below 
+				// TODO(#25): test the below 
 				/*GUILD_STAGE_VOICE*/symbolsContent.hash,
 				/*GUILD_DIRECTORY*/symbolsContent.hash,
 				/*GUILD_FORUM*/symbolsContent.hash,

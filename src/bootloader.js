@@ -199,7 +199,7 @@
 			return "/"+newPath.join("/");
 		}
 		using(file){
-			//TODO: stop things being rerun when they fail the first time
+			//TODO(#31): stop things being rerun when they fail the first time
 			var filename = this.parsePath(file);
 			if (this.modules[filename] == undefined){
 				throw `Error: the file ${file} does not exist or is not specified to run in this enviroment.`;
@@ -262,7 +262,7 @@
 
 	if (typeof document !== "undefined"){(function(loops){//this is the renderer
 		if(document.querySelector(".container-1eFtFS")==null){
-			//TODO: ask the server to re-inject if it dosent load for long enough
+			//TODO(#32): ask the server to re-inject if it dosent load for long enough
 			if (loops<20){
 				window.ThisCordTimeTillReInject = 250
 			}else{
@@ -341,7 +341,7 @@
 				try{
 					return JSON.parse(resp.body);
 				}catch(e){ if (e instanceof SyntaxError){
-					//TODO: proper error handling
+					//TODO(#33): proper error handling
 				}}
 			}); }
 			fetchScript(file) { return requestPromise("http://127.0.0.1:2829/scripts"+file).then(resp=>resp.body); }

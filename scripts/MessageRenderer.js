@@ -42,8 +42,9 @@ function resolveMentions(el){
 }
 function resolveChannelMentions(el, serverID){
 	Array.from(el.querySelectorAll("[ThisCordUnresolvedChannelMention]")).forEach(
-		// TODO: change from the /server/channels to the /channel endpoint
-		// FIXME: dosent detect threads (posibly the channel endpoint fixes this)
+		// TODO(#24): change from the /server/channels to the /channel endpoint
+
+		// FIXME(#34): dosent detect threads (posibly the channel endpoint fixes this)
 		el=>discordApi.getChannels(serverID).then(json=>{
 			var channel = json.find(r=>r.id == el.getAttribute("getChannels"))
 			if (
@@ -73,7 +74,7 @@ function resolveChannelMentions(el, serverID){
 				/*PUBLIC_THREAD*/symbolsContent.thread,
 				/*PRIVATE_THREAD*/symbolsContent.thread,
 				// the ones below i cannot test?
-				// TODO: test the below 
+				// TODO(#25): test the below 
 				/*GUILD_STAGE_VOICE*/symbolsContent.hash,
 				/*GUILD_DIRECTORY*/symbolsContent.hash,
 				/*GUILD_FORUM*/symbolsContent.hash,

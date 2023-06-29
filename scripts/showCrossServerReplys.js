@@ -27,7 +27,7 @@ AddToSettings.addPage("Embeds for message Links",template.content.cloneNode(true
 function addCSS() {
 	if (document.getElementById("ThisCordEmbedCSS") !== null) { return; }
 	var MessageEmbedTemplate = document.createElement("template");
-	// TODO: split the css into the correct file (i.e. some of this is related to the MessageRenderer.js)
+	// TODO(#29): split the css into the correct file (i.e. some of this is related to the MessageRenderer.js)
 	MessageEmbedTemplate.innerHTML = `
 	<style id="ThisCordEmbedCSS">
 		.ThisCord-embed{
@@ -78,7 +78,7 @@ function messageLink(el, paths) {
 			console.log("ThisCord: " + paths.join("/") + " not a valid message");
 			return;
 		}
-		// TODO: switch to the new AddCss module
+		// TODO(#30): switch to the new AddCss module
 		addCSS(); 
 		MessageEmbedTemplate = document.createElement("template");
 		MessageEmbedTemplate.innerHTML = `
@@ -162,7 +162,7 @@ function serverLink(el, paths) {
 
 exportAs(()=>{
 	var messageLinkHandler = el => Array
-	// FIXME: can no longer rely on the message link being in an <a> as they now have a system to display that it is a
+	// FIXME(#35): can no longer rely on the message link being in an <a> as they now have a system to display that it is a
 	//	discord message this means that we need to detect this retreive the message using discordAPI.getMessage and then
 	//	detect the message link which can then be plugged into what is allready here however the message content needs to
 	//	replace a different part of the message as the <a> is no longer there

@@ -7,7 +7,7 @@ renderer: true
 */
 
 const Css = using("/Css.js");
-
+const modules = using("modules.js");
 const CssModule = new Css();
 
 class MessageBox {
@@ -17,7 +17,7 @@ class MessageBox {
 		this.layer = document.querySelector("#app-mount").children[4].firstElementChild.children[3];
 	}
 
-	show () {
+	show() {
 		this.layer.insertAdjacentHTML('beforeend', '<div class="backgroundSmoke"></div>');
 		this.layer.insertAdjacentHTML('beforeend', `<div class="layerContainer">
 		<div class="focusLock" role="dialog" aria-labelledby=":rn:" tabindex="-1" aria-modal="true">
@@ -207,9 +207,96 @@ class MessageBox {
 
 	}
 
-	destroy () {
+	destroy() {
 		this.layer.innerHTML = '';
 	}
 }
 
-exports({ MessageBox });
+class ImageModal {
+	constructor(url, href) {
+		this.url = url;
+		this.href = href;
+		this.layer = document.querySelector("#app-mount").children[4].firstElementChild.children[3];
+	}
+
+	async show() {
+		const img = new Image();
+		img.src = this.url;
+		await img.decode();
+		const classNames = {
+			backdrop: modules.getCssName("backdrop", ["withLayer"])[0].className,
+			withLayer: modules.getCssName("backdrop", ["withLayer"])[0].otherClasses["withLayer"],
+			layer: modules.getCssName("layer", ["backdrop", "layer"])[0].className,
+			focusLock: modules.getCssName("focusLock")[0].className,
+			modal: modules.getCssName("modal", ["responsiveWidthMobile", "image"])[0].className,
+			root: modules.getCssName("root", ["spinnerContainer"])[0].className,
+			fullscreenOnMobile: modules.getCssName("fullscreenOnMobile", ["spinnerContainer"])[0].className,
+			wrapper: modules.getCssName("wrapper", ["mobileCloseWrapper"])[0].className,
+			imageWrapper: modules.getCssName("imageWrapper", ["spoiler"])[0].className,
+			image: modules.getCssName("image", ["responsiveWidthMobile", "modal"]),
+			anchor: modules.getCssName("anchor")[0].className,
+			anchorUnderlineOnHover: modules.getCssName("anchorUnderlineOnHover")[0].className,
+			downloadLink: modules.getCssName("downloadLink")[0].className
+		};
+		this.layer.insertAdjacentHTML('beforeend', `<div class="${classNames.backdrop} ${classNames.withLayer}" style="opacity: 0.85; background: var(--black-500);"></div>`);
+		this.layer.insertAdjacentHTML('beforeend', `<div id="ThisCordImageWrapper" class="${classNames.layer}">
+		<div class="${classNames.focusLock}" role="dialog" aria-labelledby=":rn:" tabindex="-1" aria-modal="true">
+			<div class="${classNames.modal} ${classNames.root} ${classNames.fullscreenOnMobile}" style="opacity: 1; transform: scale(1);">
+				<div class="${classNames.wrapper}">
+					<div class="${classNames.imageWrapper} ${classNames.image}" style="width: ${img.naturalWidth}px; height: ${img.naturalHeight}px;">
+						<img alt="Image" src="${this.url}" style="width: ${img.naturalWidth}px; height: ${img.naturalHeight}px;">
+					</div>
+					<a class="${classNames.anchor} ${classNames.anchorUnderlineOnHover} ${classNames.downloadLink}" href="${this.href}" rel="noreferrer noopener" target="_blank" role="button" tabindex="0">Open in Browser</a>
+				</div>
+			</div>
+		</div>`);
+
+		document.querySelector(`.${classNames.backdrop}`).addEventListener("click", () => (this.destroy()));
+		const focusLock = document.querySelector(`.${classNames.focusLock}`);
+		focusLock.focus();
+		focusLock.addEventListener("keydown", (e) => {
+			if (e.key === "Escape") {
+				e.stopPropagation();
+				e.stopImmediatePropagation();
+				this.destroy();
+			}
+		});
+		const imageModal = CssModule.createCss("ImageModal", `
+			@keyframes expand {
+				0%{
+					scale: 0;
+				}
+				100%{
+					scale: 1;
+				}
+			}
+			@keyframes fade {
+				0%{
+					opacity: 0;
+				}
+				100%{
+					opacity: 1;
+				}
+			}
+			#ThisCordImageWrapper{
+				animation: expand .5s forwards;
+			}
+			#ThisCordImageWrapper.closing{
+				animation: expand .5s reverse;
+			}
+			#ThisCordImageWrapper{
+				animation: fade .5s forwards;
+			}
+			#ThisCordImageWrapper.closing{
+				animation: fade .5s reverse;
+			}
+		`);
+		imageModal.inject();
+	}
+
+	destroy() {
+		this.layer.innerHTML = '';
+	}
+}
+
+exports({ MessageBox, ImageModal });

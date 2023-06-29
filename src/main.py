@@ -1,6 +1,7 @@
 from __future__ import annotations
 import os
 import sys
+import time
 from threading import Thread
 import pathnav
 
@@ -21,14 +22,17 @@ SERVERPORT = 2829
 sys.path.insert(0, COMMUNICATOR_PATH.path)
 from comunicator import ElectronComunicator
 
-def handleDiscordClose(DiscordProcess):
-	print("waiting")
-	DiscordProcess.communicate()
+def discordClosed(DiscordProcess):
 	os.kill(DiscordProcess.pid, 0)
-	DiscordProcess.kill()
-	os._exit(0) # Instead of asking all threads to also kill themselves, we just do it ourselves. Much easier and after all, we are the boss
+	os.system("TASKKILL /f /IM discord.exe > nul")
+	os._exit(0)
+
+def handleDiscordClose(DiscordProcess):
+	DiscordProcess.communicate()
+	discordClosed(DiscordProcess)
 
 def launchDiscord(args):
+	global DiscordProcess
 	EComunic = ElectronComunicator("Discord",PATH,RENDERERPORT,MAINPROCPORT,True)
 	EComunic.use_most_recent_version()
 	open = EComunic.is_already_open()
@@ -145,6 +149,11 @@ async def scripts(request: Request):
 		currentVersion = json.load(version)
 		return JSONResponse(content={"latest": response.json(), "current": currentVersion}, headers=NoCache)
 
+@server.post("/events/close")
+async def close(request: Request, response: Response):
+	print("Received close event. Cleanup initiated")
+	discordClosed(DiscordProcess)
+
 def inject(flags):
 	try:
 		discordDebugger
@@ -164,7 +173,7 @@ def inject(flags):
 			try:
 				w.run_code(f"""fetch("http://127.0.0.1:{SERVERPORT}/bootloader.js").then(response => response.text()).then(data => eval(data));""")
 			except websocket._exceptions.WebSocketBadStatusException:
-				print("Error: The injection failed discord opended")
+				print("Error: The injection failed discord opened")
 		for w in (
 			[] if "--no-inject-mainproc" in flags else
 			discordDebugger.get_mainproc_windows()

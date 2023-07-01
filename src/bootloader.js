@@ -1,4 +1,4 @@
-(function (){
+(async function (){
 	class VirtualClass{
 		constructor(vProps){
 			if (this.constructor == VirtualClass){throw "cannot create an instance of the Virtual Class";}
@@ -74,7 +74,7 @@
 	
 	
 	class ThisCord extends VirtualClass {
-		constructor(){
+		constructor(props){
 			super([
 				"fetchThroughPortal",
 				"getFromServer",
@@ -83,7 +83,11 @@
 				"createModuleFunction",
 				"context"
 			]);
-			this.getJsonFromServer("/filesList")
+			let propsVal = [];
+			if (typeof props == "object") { propsVal = Object.keys(props); }
+			(propsVal.includes("files") ?
+			Promise.resolve(props.files) :
+			this.getJsonFromServer("/filesList"))
 			.then(files=>{
 				this._files = files;
 				return files;
@@ -327,10 +331,30 @@
 		}
 	})(0)}
 	if (typeof require !== "undefined"){// this is the backend
-		// for some reason some installs of discord start in different locations this means that we always know where we are
-		process.chdir(process.resourcesPath);
+		const Module = require("node:module");
 
-		const request = require("./app.asar/node_modules/request");
+		let ModuleResolveFilename = Module._resolveFilename;
+		const prefixes = new Map([
+			["app",process.resourcesPath+"/app.asar"],
+			["app_node_modules",process.resourcesPath+"/app.asar/node_modules"],
+		]);
+		// this is patched to make require easier to use from the modules that require from the ThisCord install dir (see(#39))
+		Module._resolveFilename = function(request, parent, isMain, options) {
+			if (request.indexOf(":") >= 0){
+				let prefix = prefixes.get(request.split(":")[0]);
+				if (prefix !== undefined) {
+					console.log(`request modified from ${request}`);
+					request = prefix+"/"+request.substring(request.indexOf(":")+1)
+					console.log(`to ${request}`);
+				}
+			}
+
+			let args = [...arguments];
+			args[0] = request;
+			return ModuleResolveFilename(...args);
+		}
+
+		const request = require("app_node_modules:request");
 		const util = require('node:util');
 		const requestPromise = util.promisify(request);
 		class ThisCordBackend extends ThisCord{

@@ -9,7 +9,7 @@ entryPoint: "main"
 
 console.log("ProcessCleanup LOADED!");
 const { app } = require('electron');
-const request = require(process.cwd() + "/app.asar/node_modules/request");
+const request = require("app_node_modules:request");
 
 
 app.on('before-quit', async (event) => {

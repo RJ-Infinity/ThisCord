@@ -160,7 +160,7 @@
 		generateModule(file){
 			return this
 			.fetchScript(file)
-			.then(this.getScriptInfo)
+			.then(this.getScriptInfo,reason=>console.error(`ThisCord: ERROR: failed to get '${file}' because: ${reason}`))
 			.then(({script,info}) => {
 				if (!info.has(this.context) || info.get(this.context) !== true) { return; }
 				if (file.substring(file.length - 3) == ".js"){
@@ -184,7 +184,7 @@
 					return;
 				}
 				console.warn(`ThisCord: ${file} not in known format. Skiping.`);
-			},(reason)=>console.warn(`ThisCord: ${file} being skipped due to the error in the UserScript comment: ${reason}`));
+			},reason=>console.warn(`ThisCord: ${file} being skipped due to the error in the UserScript comment: ${reason}`));
 		}
 		parsePath(path){
 			var newPath = [];
@@ -356,7 +356,9 @@
 
 		const request = require("app_node_modules:request");
 		const util = require('node:util');
+		const fs = require('node:fs');
 		const requestPromise = util.promisify(request);
+		const readFilePromise = util.promisify(fs.readFile);
 		class ThisCordBackend extends ThisCord{
 			constructor(){ super(); }
 			fetchThroughPortal(){}
@@ -368,7 +370,7 @@
 					//TODO(#33): proper error handling
 				}}
 			}); }
-			fetchScript(file) { return requestPromise("http://127.0.0.1:2829/scripts"+file).then(resp=>resp.body); }
+			fetchScript(file) { return readFilePromise(this._files.install_dir+"\\scripts\\"+file).then(f=>f.toString()); }
 			createModuleFunction(file, script, info)
 			{ return () => { require(this._files.install_dir+"\\scripts\\"+file); } }
 			get context() { return "backend"; }

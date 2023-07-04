@@ -1,6 +1,6 @@
 /* @Thiscord-Script
 name: "Graphics"
-author: "titushm"
+author: ["titushm", "RJ_Infinity"]
 version: "builtin"
 description: "Contains classes to show graphical elements"
 renderer: true
@@ -213,46 +213,42 @@ class MessageBox {
 }
 
 class ImageModal {
+	//TODO(#28): add a handler for the context menu because it sends you to the wrong link
 	constructor(url, href) {
 		this.url = url;
 		this.href = href;
-		this.layer = document.querySelector("#app-mount").children[4].firstElementChild.children[3];
+	}
+
+	static classNames = {
+		backdrop: modules.getCssName("backdrop", ["withLayer"])[0].className,
+		withLayer: modules.getCssName("backdrop", ["withLayer"])[0].otherClasses["withLayer"],
+		layer: modules.getCssName("layer", ["backdrop", "layer"])[0].className,
+		focusLock: modules.getCssName("focusLock")[0].className,
+		modal: modules.getCssName("modal", ["responsiveWidthMobile", "image"])[0].className,
+		root: modules.getCssName("root", ["spinnerContainer"])[0].className,
+		fullscreenOnMobile: modules.getCssName("fullscreenOnMobile", ["spinnerContainer"])[0].className,
+		wrapper: modules.getCssName("wrapper", ["mobileCloseWrapper"])[0].className,
+		imageWrapper: modules.getCssName("imageWrapper", ["spoiler"])[0].className,
+		image: modules.getCssName("image", ["responsiveWidthMobile", "modal"]),
+		anchor: modules.getCssName("anchor")[0].className,
+		anchorUnderlineOnHover: modules.getCssName("anchorUnderlineOnHover")[0].className,
+		downloadLink: modules.getCssName("downloadLink")[0].className,
+		layerContainer:modules.getCssName("layerContainer")[0].className,
 	}
 
 	async show() {
-		const img = new Image();
-		img.src = this.url;
-		await img.decode();
-		const classNames = {
-			backdrop: modules.getCssName("backdrop", ["withLayer"])[0].className,
-			withLayer: modules.getCssName("backdrop", ["withLayer"])[0].otherClasses["withLayer"],
-			layer: modules.getCssName("layer", ["backdrop", "layer"])[0].className,
-			focusLock: modules.getCssName("focusLock")[0].className,
-			modal: modules.getCssName("modal", ["responsiveWidthMobile", "image"])[0].className,
-			root: modules.getCssName("root", ["spinnerContainer"])[0].className,
-			fullscreenOnMobile: modules.getCssName("fullscreenOnMobile", ["spinnerContainer"])[0].className,
-			wrapper: modules.getCssName("wrapper", ["mobileCloseWrapper"])[0].className,
-			imageWrapper: modules.getCssName("imageWrapper", ["spoiler"])[0].className,
-			image: modules.getCssName("image", ["responsiveWidthMobile", "modal"]),
-			anchor: modules.getCssName("anchor")[0].className,
-			anchorUnderlineOnHover: modules.getCssName("anchorUnderlineOnHover")[0].className,
-			downloadLink: modules.getCssName("downloadLink")[0].className
-		};
-		this.layer.insertAdjacentHTML('beforeend', `<div class="${classNames.backdrop} ${classNames.withLayer}" style="opacity: 0.85; background: var(--black-500);"></div>`);
-		this.layer.insertAdjacentHTML('beforeend', `<div id="ThisCordImageWrapper" class="${classNames.layer}">
-		<div class="${classNames.focusLock}" role="dialog" aria-labelledby=":rn:" tabindex="-1" aria-modal="true">
-			<div class="${classNames.modal} ${classNames.root} ${classNames.fullscreenOnMobile}" style="opacity: 1; transform: scale(1);">
-				<div class="${classNames.wrapper}">
-					<div class="${classNames.imageWrapper} ${classNames.image}" style="width: ${img.naturalWidth}px; height: ${img.naturalHeight}px;">
-						<img alt="Image" src="${this.url}" style="width: ${img.naturalWidth}px; height: ${img.naturalHeight}px;">
-					</div>
-					<a class="${classNames.anchor} ${classNames.anchorUnderlineOnHover} ${classNames.downloadLink}" href="${this.href}" rel="noreferrer noopener" target="_blank" role="button" tabindex="0">Open in Browser</a>
-				</div>
-			</div>
-		</div>`);
+		var modal = this.constructor.modalTemplate.content.cloneNode(true);
+		modal.getElementById("ThisCordImg").src = this.url;
+		modal.getElementById("ThisCordLink").href = this.href;
 
-		document.querySelector(`.${classNames.backdrop}`).addEventListener("click", () => (this.destroy()));
-		const focusLock = document.querySelector(`.${classNames.focusLock}`);
+		// these two must be before the modal gets emptied into the layer container
+		this.wrapper = modal.getElementById("ThisCordImageWrapper");
+		this.background = modal.getElementById("ThisCordBackground");
+
+		document.querySelector("div+."+this.constructor.classNames.layerContainer).appendChild(modal);
+
+		this.background.addEventListener("click", this.destroy.bind(this));
+		const focusLock = document.querySelector(`.${this.constructor.classNames.focusLock}`);
 		focusLock.focus();
 		focusLock.addEventListener("keydown", (e) => {
 			if (e.key === "Escape") {
@@ -295,7 +291,27 @@ class ImageModal {
 	}
 
 	destroy() {
-		this.layer.innerHTML = '';
+		this.background.removeEventListener("click", this.destroy);
+		this.wrapper?.remove?.();
+		this.background?.remove?.();
+	}
+	static modalTemplate = document.createElement("template");
+
+	static{
+		this.modalTemplate.innerHTML = 
+		`<div id="ThisCordBackground" class="${this.classNames.backdrop} ${this.classNames.withLayer}" style="opacity: 0.85; background: hsl(0, calc(var(--saturation-factor, 1) * 0%), 0%);"></div>
+		<div id="ThisCordImageWrapper" class="${this.classNames.layer}">
+			<div class="${this.classNames.focusLock}" role="dialog" aria-label="Image" tabindex="-1" aria-modal="true">
+				<div class="${this.classNames.modal} ${this.classNames.root} ${this.classNames.fullscreenOnMobile}" style="opacity: 1; transform: scale(1);">
+					<div class="${this.classNames.wrapper}">
+						<div class="${this.classNames.imageWrapper} ${this.classNames.image}" style="width: 593px; height: 593px;">
+							<img id="ThisCordImg" alt="Image" style="width: 593px; height: 593px;">
+						</div>
+						<a id="ThisCordLink" class="${this.classNames.anchor} ${this.classNames.anchorUnderlineOnHover} ${this.classNames.downloadLink}" rel="noreferrer noopener" target="_blank" role="button" tabindex="0">Open in Browser</a>
+					</div>
+				</div>
+			</div>
+		</div>`
 	}
 }
 

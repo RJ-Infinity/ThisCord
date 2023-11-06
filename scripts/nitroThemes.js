@@ -1,12 +1,11 @@
 /* @Thiscord-Script
 name: "Nitro Theme"
-author: ["titushm", "RJ_Infinity"]
+author: "titushm"
 version: "builtin"
-description: "gives acsess to the styles that usualy require nitro"
+description: "gives access to the styles that usually require nitro"
 renderer: true
 entryPoint: "main"
 */
-
 
 var AddToSettings = using("/AddToSettings.js");
 var Css = using("/Css.js");
@@ -98,7 +97,7 @@ template.innerHTML = `
 template = template.content.cloneNode(true);
 template.querySelector("#theme-selector").addEventListener("change", themeHandler);
 
-function themeHandler (e) {
+function themeHandler(e) {
 	var options = e.target.options;
 	var value = options[options.selectedIndex].value;
 	CssModule.eject();
@@ -109,9 +108,9 @@ function themeHandler (e) {
 
 AddToSettings.addPage("Nitro Themes", template);
 
-exportAs(()=>{
-	var themeObserver = new MutationObserver(mutations => {
-		mutations.forEach(mutation => {
+exportAs(() => {
+	var themeObserver = new MutationObserver((mutations) => {
+		mutations.forEach((mutation) => {
 			if (mutation.type === "attributes" && mutation.target === document.documentElement) {
 				var classList = document.documentElement.classList;
 				if (!classList.contains("custom-theme-background")) {
@@ -122,4 +121,4 @@ exportAs(()=>{
 	});
 
 	themeObserver.observe(document.documentElement, { attributes: true, attributeOldValue: true });
-},"main");
+}, "main");

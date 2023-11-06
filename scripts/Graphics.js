@@ -1,8 +1,8 @@
 /* @Thiscord-Script
 name: "Graphics"
-author: ["titushm", "RJ_Infinity"]
+author: "titushm"
 version: "builtin"
-description: "Contains classes to show graphical elements"
+description: "The graphics library for thiscord"
 renderer: true
 */
 
@@ -10,34 +10,51 @@ const Css = using("/Css.js");
 const modules = using("modules.js");
 const CssModule = new Css();
 
+function generateRandomUID() {
+	var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	var randomString = "";
+	for (var i = 0; i < 5; i++) {
+		var randomIndex = Math.floor(Math.random() * chars.length);
+		randomString += chars[randomIndex];
+	}
+	return randomString;
+}
 class MessageBox {
 	constructor(title, message) {
 		this.title = title;
 		this.message = message;
 		this.layer = document.querySelector("#app-mount").children[4].firstElementChild.children[3];
+		this.uid = generateRandomUID();
+		this.shown = false;
 	}
 
 	show() {
-		this.layer.insertAdjacentHTML('beforeend', '<div class="backgroundSmoke"></div>');
-		this.layer.insertAdjacentHTML('beforeend', `<div class="layerContainer">
-		<div class="focusLock" role="dialog" aria-labelledby=":rn:" tabindex="-1" aria-modal="true">
-			<div class="root" style="opacity: 1; transform: scale(1);">
-				<div class="header" id=":rn:" style="flex: 0 0 auto;">
-					<div class="title">${this.title}</div>
-					<div class="content" style="color: var(--header-secondary);">${this.message}</div>
-					<button aria-label="Close" type="button" class="closeButton">
-						<div class="closeButtonContents">
-							<svg aria-hidden="true" role="img" class="closeIcon" width="24" height="24" viewBox="0 0 24 24">
-								<path fill="currentColor" d="M18.4 4L12 10.4L5.6 4L4 5.6L10.4 12L4 18.4L5.6 20L12 13.6L18.4 20L20 18.4L13.6 12L20 5.6L18.4 4Z"></path>
-							</svg>
+		if (this.shown) return;
+		this.layer.insertAdjacentHTML("beforeend", `<div class="backgroundSmoke" id="${this.uid}"></div>`);
+		this.layer.insertAdjacentHTML(
+			"beforeend",
+			`<div class="layerContainer" id="${this.uid}">
+				<div class="focusLock" role="dialog" aria-labelledby=":rn:" tabindex="-1" aria-modal="true">
+					<div class="root" style="opacity: 1; transform: scale(1);">
+						<div class="header" id=":rn:" style="flex: 0 0 auto;">
+							<div class="title">${this.title}</div>
+							<div class="content" style="color: var(--header-secondary);">${this.message}</div>
+							<button aria-label="Close" type="button" class="closeButton" id="${this.uid}">
+								<div class="closeButtonContents">
+									<svg aria-hidden="true" role="img" class="closeIcon" width="24" height="24" viewBox="0 0 24 24">
+										<path fill="currentColor" d="M18.4 4L12 10.4L5.6 4L4 5.6L10.4 12L4 18.4L5.6 20L12 13.6L18.4 20L20 18.4L13.6 12L20 5.6L18.4 4Z"></path>
+									</svg>
+								</div>
+							</button>
+							</div>
 						</div>
-					</button>
 					</div>
-				</div>
-			</div>
-		</div>`);
+				</div>`
+		);
 
-		const messageBoxCss = CssModule.createCss("messageBoxCss", `
+		const messageBoxCss = CssModule.createCss(
+			"messageBoxCss",
+			`
 			.backgroundSmoke {
 					opacity: 0.85;
 					background: var(--black-500);
@@ -154,7 +171,6 @@ class MessageBox {
 				padding: 4px;
 				-webkit-transition: opacity .2s ease-in-out;
 				transition: opacity .2s ease-in-out;
-				opacity: .5;
 				cursor: pointer;
 				border-radius: 3px;
 				color: var(--interactive-normal);
@@ -182,8 +198,6 @@ class MessageBox {
 				-moz-user-select: none;
 				-ms-user-select: none;
 				user-select: none;
-				background: transparent;
-				color: currentColor;
 				border: 0;
 				padding: 0;
 				margin: 0;
@@ -199,56 +213,70 @@ class MessageBox {
 				--button--underline-color: transparent;
 				background-image: linear-gradient(0deg,transparent,transparent 1px,var(--button--underline-color) 0,var(--button--underline-color) 2px,transparent 0);
 			}
-			`);
+			`
+		);
 
 		messageBoxCss.inject();
-		document.querySelector(".closeButton").addEventListener("click", () => (this.destroy()));
-		document.querySelector(".backgroundSmoke").addEventListener("click", () => (this.destroy()));
-
+		const closeCallback = () => {
+			this.destroy();
+			this.shown = false;
+		};
+		document.querySelector(`.closeButton#${this.uid}`).addEventListener("click", closeCallback);
+		document.querySelector(`.backgroundSmoke#${this.uid}`).addEventListener("click", closeCallback);
+		this.shown = true;
 	}
 
 	destroy() {
-		this.layer.innerHTML = '';
+		document.querySelector(`.backgroundSmoke#${this.uid}`).remove();
+		document.querySelector(`.layerContainer#${this.uid}`).remove();
 	}
 }
 
 class ImageModal {
-	//TODO(#28): add a handler for the context menu because it sends you to the wrong link
 	constructor(url, href) {
 		this.url = url;
 		this.href = href;
-	}
-
-	static classNames = {
-		backdrop: modules.getCssName("backdrop", ["withLayer"])[0].className,
-		withLayer: modules.getCssName("backdrop", ["withLayer"])[0].otherClasses["withLayer"],
-		layer: modules.getCssName("layer", ["backdrop", "layer"])[0].className,
-		focusLock: modules.getCssName("focusLock")[0].className,
-		modal: modules.getCssName("modal", ["responsiveWidthMobile", "image"])[0].className,
-		root: modules.getCssName("root", ["spinnerContainer"])[0].className,
-		fullscreenOnMobile: modules.getCssName("fullscreenOnMobile", ["spinnerContainer"])[0].className,
-		wrapper: modules.getCssName("wrapper", ["mobileCloseWrapper"])[0].className,
-		imageWrapper: modules.getCssName("imageWrapper", ["spoiler"])[0].className,
-		image: modules.getCssName("image", ["responsiveWidthMobile", "modal"]),
-		anchor: modules.getCssName("anchor")[0].className,
-		anchorUnderlineOnHover: modules.getCssName("anchorUnderlineOnHover")[0].className,
-		downloadLink: modules.getCssName("downloadLink")[0].className,
-		layerContainer:modules.getCssName("layerContainer")[0].className,
+		this.layer = document.querySelector("#app-mount").children[4].firstElementChild.children[3];
+		this.uid = generateRandomUID();
 	}
 
 	async show() {
-		var modal = this.constructor.modalTemplate.content.cloneNode(true);
-		modal.getElementById("ThisCordImg").src = this.url;
-		modal.getElementById("ThisCordLink").href = this.href;
+		const img = new Image();
+		img.src = this.url;
+		await img.decode();
+		const classNames = {
+			backdrop: modules.getCssName("backdrop", ["withLayer"])[0].className,
+			withLayer: modules.getCssName("backdrop", ["withLayer"])[0].otherClasses["withLayer"],
+			layer: modules.getCssName("layer", ["backdrop", "layer"])[0].className,
+			focusLock: modules.getCssName("focusLock")[0].className,
+			modal: modules.getCssName("modal", ["responsiveWidthMobile", "image"])[0].className,
+			root: modules.getCssName("root", ["spinnerContainer"])[0].className,
+			fullscreenOnMobile: modules.getCssName("fullscreenOnMobile", ["spinnerContainer"])[0].className,
+			wrapper: modules.getCssName("wrapper", ["mobileCloseWrapper"])[0].className,
+			imageWrapper: modules.getCssName("imageWrapper", ["spoiler"])[0].className,
+			image: modules.getCssName("image", ["responsiveWidthMobile", "modal"]),
+			anchor: modules.getCssName("anchor")[0].className,
+			anchorUnderlineOnHover: modules.getCssName("anchorUnderlineOnHover")[0].className,
+			downloadLink: modules.getCssName("downloadLink")[0].className,
+		};
+		this.layer.insertAdjacentHTML("beforeend", `<div class="${classNames.backdrop} ${classNames.withLayer}" id="${this.uid}" style="opacity: 0.85; background: var(--black-500);"></div>`);
+		this.layer.insertAdjacentHTML(
+			"beforeend",
+			`<div id="ThisCordImageWrapper ${this.uid}" class="${classNames.layer}">
+		<div class="${classNames.focusLock}" role="dialog" aria-labelledby=":rn:" tabindex="-1" aria-modal="true">
+			<div class="${classNames.modal} ${classNames.root} ${classNames.fullscreenOnMobile}" style="opacity: 1; transform: scale(1);">
+				<div class="${classNames.wrapper}">
+					<div class="${classNames.imageWrapper} ${classNames.image}" style="width: ${img.naturalWidth}px; height: ${img.naturalHeight}px;">
+						<img alt="Image" src="${this.url}" style="width: ${img.naturalWidth}px; height: ${img.naturalHeight}px;">
+					</div>
+					<a class="${classNames.anchor} ${classNames.anchorUnderlineOnHover} ${classNames.downloadLink}" href="${this.href}" rel="noreferrer noopener" target="_blank" role="button" tabindex="0">Open in Browser</a>
+				</div>
+			</div>
+		</div>`
+		);
 
-		// these two must be before the modal gets emptied into the layer container
-		this.wrapper = modal.getElementById("ThisCordImageWrapper");
-		this.background = modal.getElementById("ThisCordBackground");
-
-		document.querySelector("div+."+this.constructor.classNames.layerContainer).appendChild(modal);
-
-		this.background.addEventListener("click", this.destroy.bind(this));
-		const focusLock = document.querySelector(`.${this.constructor.classNames.focusLock}`);
+		document.querySelector(`.${classNames.backdrop}`).addEventListener("click", () => this.destroy());
+		const focusLock = document.querySelector(`.${classNames.focusLock}`);
 		focusLock.focus();
 		focusLock.addEventListener("keydown", (e) => {
 			if (e.key === "Escape") {
@@ -257,7 +285,9 @@ class ImageModal {
 				this.destroy();
 			}
 		});
-		const imageModal = CssModule.createCss("ImageModal", `
+		const imageModal = CssModule.createCss(
+			"ImageModal",
+			`
 			@keyframes expand {
 				0%{
 					scale: 0;
@@ -286,32 +316,14 @@ class ImageModal {
 			#ThisCordImageWrapper.closing{
 				animation: fade .5s reverse;
 			}
-		`);
+		`
+		);
 		imageModal.inject();
 	}
 
 	destroy() {
-		this.background.removeEventListener("click", this.destroy);
-		this.wrapper?.remove?.();
-		this.background?.remove?.();
-	}
-	static modalTemplate = document.createElement("template");
-
-	static{
-		this.modalTemplate.innerHTML = 
-		`<div id="ThisCordBackground" class="${this.classNames.backdrop} ${this.classNames.withLayer}" style="opacity: 0.85; background: hsl(0, calc(var(--saturation-factor, 1) * 0%), 0%);"></div>
-		<div id="ThisCordImageWrapper" class="${this.classNames.layer}">
-			<div class="${this.classNames.focusLock}" role="dialog" aria-label="Image" tabindex="-1" aria-modal="true">
-				<div class="${this.classNames.modal} ${this.classNames.root} ${this.classNames.fullscreenOnMobile}" style="opacity: 1; transform: scale(1);">
-					<div class="${this.classNames.wrapper}">
-						<div class="${this.classNames.imageWrapper} ${this.classNames.image}" style="width: 593px; height: 593px;">
-							<img id="ThisCordImg" alt="Image" style="width: 593px; height: 593px;">
-						</div>
-						<a id="ThisCordLink" class="${this.classNames.anchor} ${this.classNames.anchorUnderlineOnHover} ${this.classNames.downloadLink}" rel="noreferrer noopener" target="_blank" role="button" tabindex="0">Open in Browser</a>
-					</div>
-				</div>
-			</div>
-		</div>`
+		document.querySelector(`.${classNames.backdrop} ${classNames.withLayer}#${this.uid}`).remove();
+		document.querySelector(`.${classNames.layer}#${this.uid}`).remove();
 	}
 }
 

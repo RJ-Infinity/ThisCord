@@ -1,13 +1,19 @@
-1. The Discord mod is provided "as is" without any warranties or guarantees of any kind. The user is solely responsible for any damage or loss resulting from the use of the mod.
+The 'Program' refers to any peice of software distributed in relation to the 'ThisCord' project
 
-2. The user is responsible for ensuring that they have the necessary permissions and rights to use the Discord mod.
+1. The Program is provided "as is" without any warranties or guarantees of any kind. The user is solely responsible for any damage or loss resulting from the use of the mod.
 
-3. The user agrees to not use the Discord mod for any illegal or malicious purposes, including but not limited to attempting to access or damage any third-party systems or networks.
+2. The user is responsible for ensuring that they have the necessary permissions and rights to use the Program.
 
-4. The user understands that the Discord mod may modify or alter the appearance or behavior of the Discord app, and agrees to not hold the creator of the mod responsible for any such changes.
+3. The user agrees to not use the Program for any illegal or malicious purposes, including but not limited to attempting to access or damage any third-party systems or networks.
 
-5. The user agrees to not distribute, reproduce, or share the Discord mod without the express written consent of the creator.
+4. The user understands that the Program may modify or alter the appearance or behavior of the Discord app, and agrees to not hold the creator of the Program responsible for any such changes or any damages.
 
-6. These terms and conditions may be updated by the creator of the Discord mod at any time, and the user agrees to be bound by any such updates.
+5. The user agrees to not distribute, reproduce, or share the Program without providing a clear reference to the original source of the Program.
 
-7. By using the Discord mod, the user agrees to be bound by these terms and conditions. If the user does not agree to these terms and conditions, they should not use the Discord mod.
+6. These terms and conditions may be updated by the creator of the Program at any time, and the user agrees to be bound by any such updates.
+
+7. By using the Program, the user agrees to be bound by these terms and conditions. If the user does not agree to these terms and conditions, they should not use the Program.
+
+
+Data Collection
+the Program does not ever collect any data from the users for any purposes nor does it send any data to any other services
